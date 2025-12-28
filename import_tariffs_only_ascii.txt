@@ -1,0 +1,76 @@
+Starting Import...
+Processing row: {"proveedor":null,"zona":"Zona hotelera - cancun","pasajeros":"1 a 8","costo_mayorista":1000,"4":null,"precio_publico":"=SUM(I2+(I2*0.12))","costo_publico_promo":"=SUM(I2+(I2*0.15))"}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":"Puerto Juarez - muelle - al ritmo","pasajeros":"1 a 8","costo_mayorista":1000,"4":null,"precio_publico":"=SUM(I3+(I3*0.12))","costo_publico_promo":"=SUM(I3+(I3*0.15))"}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":"Playa mujeres - Costa mujeres","pasajeros":"1 a 8","costo_mayorista":1200,"4":null,"precio_publico":"=SUM(I4+(I4*0.12))","costo_publico_promo":"=SUM(I4+(I4*0.15))"}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":"Puerto Morelos","pasajeros":"1 a 8","costo_mayorista":1200,"4":null,"precio_publico":"=SUM(I5+(I5*0.12))","costo_publico_promo":"=SUM(I5+(I5*0.15))"}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":"Playa del carmen - Playa car","pasajeros":"1 a 8","costo_mayorista":1600,"4":null,"precio_publico":"=SUM(I6+(I6*0.12))","costo_publico_promo":"=SUM(I6+(I6*0.15))"}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":"Puerto Aventuras","pasajeros":"1 a 8","costo_mayorista":1700,"4":null,"precio_publico":"=SUM(I7+(I7*0.12))","costo_publico_promo":"=SUM(I7+(I7*0.15))"}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":"Akumal","pasajeros":"1 a 8","costo_mayorista":1800,"4":null,"precio_publico":"=SUM(I8+(I8*0.12))","costo_publico_promo":"=SUM(I8+(I8*0.15))"}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":"Tulum","pasajeros":"1 a 8","costo_mayorista":2250,"4":null,"precio_publico":"=SUM(I9+(I9*0.12))","costo_publico_promo":"=SUM(I9+(I9*0.15))"}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":"Zona hotelera - cancun","pasajeros":"1 a 6","costo_mayorista":1500,"4":null,"precio_publico":"=SUM(I10+(I10*0.12))","costo_publico_promo":"=SUM(I10+(I10*0.15))"}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":"Playa mujeres - Costa mujeres","pasajeros":"1 a 6","costo_mayorista":1700,"4":null,"precio_publico":"=SUM(I11+(I11*0.12))","costo_publico_promo":"=SUM(I11+(I11*0.15))"}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":"Puerto Morelos","pasajeros":"1 a 6","costo_mayorista":1650,"4":null,"precio_publico":"=SUM(I12+(I12*0.12))","costo_publico_promo":"=SUM(I12+(I12*0.15))"}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":"Playa del carme ","pasajeros":"1 a 6","costo_mayorista":1900,"4":null,"precio_publico":"=SUM(I13+(I13*0.12))","costo_publico_promo":"=SUM(I13+(I13*0.15))"}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":"Puerto aventuras","pasajeros":"1 a 6","costo_mayorista":2250,"4":null,"precio_publico":"=SUM(I14+(I14*0.12))","costo_publico_promo":"=SUM(I14+(I14*0.15))"}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":"Akumal","pasajeros":"1 a 6","costo_mayorista":2300,"4":null,"precio_publico":"=SUM(I15+(I15*0.12))","costo_publico_promo":"=SUM(I15+(I15*0.15))"}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":"Tulum  ","pasajeros":"1 a 6","costo_mayorista":3100,"4":null,"precio_publico":"=SUM(I16+(I16*0.12))","costo_publico_promo":"=SUM(I16+(I16*0.15))"}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+Provider Name: ''
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+Provider Name: ''
+Import Success.
+SQL: select count(*) as aggregate from "providers" []
+Providers: 1
+SQL: select count(*) as aggregate from "tariffs" []
+Tariffs: 0
+SQL: select * from "providers" where "is_default" = ? limit 1 [1]
+No Default Provider found.

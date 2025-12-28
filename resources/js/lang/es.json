@@ -1,0 +1,114 @@
+{
+    "nav": {
+        "home": "Inicio",
+        "services": "Servicios",
+        "shop": "Tienda",
+        "blog": "Blog",
+        "contact": "Contacto",
+        "register": "Registrarse",
+        "login": "Iniciar Sesión"
+    },
+    "hero": {
+        "title": "Encuentra tu Equilibrio.\nSana tu Mente. (PRUEBA)",
+        "subtitle": "Servicios de terapia profesional adaptados a tu viaje único. Brindamos un espacio seguro para el crecimiento, la curación y el autodescubrimiento.",
+        "cta_services": "Ver Servicios",
+        "cta_contact": "Contáctanos",
+        "book_now": "Reservar Ahora"
+    },
+    "services": {
+        "title": "Nuestros Servicios",
+        "subtitle": "Atención integral para individuos, parejas y familias.",
+        "learn_more": "Leer más",
+        "view_all": "Ver todos los servicios",
+        "price_per_min": "${price} / {minutes}m",
+        "add_to_cart": "Agregar al Carrito",
+        "book_now": "Reservar Ahora",
+        "couples": "Terapia de Pareja",
+        "family": "Terapia Familiar"
+    },
+    "shop": {
+        "title": "Tienda de Recursos",
+        "subtitle": "Herramientas digitales para tu bienestar",
+        "all": "Todos",
+        "ebooks": "eBooks",
+        "videos": "Videos",
+        "manuals": "Manuales",
+        "no_products": "No se encontraron productos en esta categoría."
+    },
+    "philosophy": {
+        "title": "Tu Paz es Nuestra Prioridad",
+        "p1": "Creemos que la salud mental es tan importante como la salud física. Nuestro enfoque se basa en la empatía, el respeto y las prácticas basadas en la evidencia.",
+        "p2": "Ya sea que estés lidiando con ansiedad, problemas de relación o simplemente necesites alguien con quien hablar, estamos aquí para apoyarte en cada paso del camino."
+    },
+    "gallery": {
+        "title": "Nuestra Galería",
+        "subtitle": "Un vistazo a nuestros espacios y actividades.",
+        "individual": "Terapia Individual",
+        "group": "Terapia en Grupo",
+        "workshops": "Talleres",
+        "conferences": "Conferencias"
+    },
+    "blog": {
+        "title": "Lo Último del Blog",
+        "read_article": "Leer artículo"
+    },
+    "booking": {
+        "individual_title": "Reserva Individual",
+        "individual_registration": "Registro Individual",
+        "special_title": "Reserva de Servicios Especiales",
+        "special_registration": "Registro para Servicios Especiales",
+        "photo_required": "Foto requerida",
+        "photo_required_desc": "Por favor toma o sube una foto personal para continuar.",
+        "requirements": "Requerimientos Especiales / Mensaje",
+        "requirements_placeholder": "Por favor describa sus necesidades específicas, número de participantes estimados, y cualquier otra información relevante...",
+        "profile_photo": "Foto de Perfil",
+        "take_photo": "Tomar Foto",
+        "upload_photo": "Subir Foto",
+        "select_gender": "Seleccionar Género",
+        "male": "Masculino",
+        "female": "Femenino",
+        "non_binary": "No Binario",
+        "other": "Otro",
+        "specify_gender": "Especifique",
+        "continue_to_calendar": "Continuar al Calendario",
+        "primary_contact": "Contacto Principal",
+        "participants": "Participantes",
+        "add_participant": "Agregar Participante",
+        "participant": "Participante",
+        "remove_participant": "Eliminar",
+        "payment_title": "Pago",
+        "payment_details": "Detalles del Pago",
+        "summary": "Resumen",
+        "service": "Servicio",
+        "date": "Fecha",
+        "total": "Total",
+        "select_payment_method": "Seleccione Método de Pago",
+        "pay_online": "Pago en Línea",
+        "pay_online_desc": "Tarjeta de Crédito/Débito vía Stripe",
+        "bank_transfer": "Transferencia Bancaria",
+        "bank_transfer_desc": "Ver datos bancarios",
+        "cash_on_arrival": "Efectivo",
+        "cash_on_arrival_desc": "Pagar al llegar a la cita",
+        "confirm_booking": "Confirmar Reserva",
+        "select_service_type": "Seleccione Tipo de Servicio",
+        "individual_therapy": "Terapia Individual",
+        "couples_therapy": "Terapia de Pareja",
+        "family_therapy": "Terapia Familiar",
+        "group_therapy": "Terapia Grupal",
+        "select_date": "Selecciona una Fecha y Hora",
+        "reservation_for": "Reserva para",
+        "no_slots": "No hay horarios disponibles para esta fecha.",
+        "confirm_date": "Confirmar Fecha",
+        "next": "Siguiente"
+    },
+    "common": {
+        "cancel": "Cancelar"
+    },
+    "footer": {
+        "description": "Brindando servicios de terapia profesional y compasiva para ayudarte a navegar los desafíos de la vida.",
+        "quick_links": "Enlaces Rápidos",
+        "social": "Síguenos",
+        "contact": "Contacto",
+        "rights": "Todos los derechos reservados."
+    }
+}

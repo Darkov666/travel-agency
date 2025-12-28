@@ -1,0 +1,24 @@
+# Tasks
+
+- [x] Debug Workshop Data Loading <!-- id: 0 -->
+    - [x] Identify the controller and view/component for `/services` <!-- id: 1 -->
+    - [x] Check if Workshop data exists in the database <!-- id: 2 -->
+    - [x] Verify data passing from Controller to Vue <!-- id: 3 -->
+    - [x] Fix data loading/display issue <!-- id: 4 -->
+- [x] Fix Translation Keys <!-- id: 5 -->
+    - [x] Identify missing keys (`services.title`, `gallery.workshops`, `shop.no_products` etc.) <!-- id: 6 -->
+    - [x] Add missing translation keys <!-- id: 7 -->
+- [x] Implement Workshop Booking UI <!-- id: 8 -->
+    - [x] Update `ServiceCard.vue` to hide price/cart for workshops <!-- id: 9 -->
+    - [x] Add "Book Meeting" button for workshops <!-- id: 10 -->
+- [x] Database Updates <!-- id: 11 -->
+    - [x] Create migration for `organization_type` and `organization_other` in `appointments` <!-- id: 12 -->
+- [x] Implement Workshop Booking Form <!-- id: 13 -->
+    - [x] Create `WorkshopForm.vue` with Organization fields <!-- id: 14 -->
+    - [x] Implement existing fields (contact, etc.) <!-- id: 15 -->
+- [x] Backend Implementation <!-- id: 16 -->
+    - [x] Add `BookingController` methods (`showWorkshopForm`, `storeWorkshop`) <!-- id: 17 -->
+    - [x] Define Routes for Workshop booking <!-- id: 18 -->
+- [x] Payment & Approval Flow <!-- id: 19 -->
+    - [x] Skip payment step for workshops <!-- id: 20 -->
+    - [x] Ensure Admin Approval notification is triggered <!-- id: 21 -->

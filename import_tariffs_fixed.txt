@@ -1,0 +1,5 @@
+Starting Import...
+Processing row: {"proveedor":null,"zona":"Zona hotelera - cancun","pasajeros":"1 a 8","costo_mayorista":1000,"4":null,"precio_publico":"=SUM(I2+(I2*0.12))","costo_publico_promo":"=SUM(I2+(I2*0.15))"}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+SQL: insert into "providers" ("name", "is_default", "is_active", "updated_at", "created_at") values (?, ?, ?, ?, ?) [Enjoy Transfers, 1, 1, 2025-12-28 05:56:32, 2025-12-28 05:56:32]
+Error: SQLSTATE[23000]: Integrity constraint violation: 19 NOT NULL constraint failed: tariffs.service_type (Connection: sqlite, SQL: insert into "tariffs" ("provider_id", "zone", "pax", "cost", "price", "updated_at", "created_at") values (2, Zona hotelera - cancun, 1 a 8, 1000, 1100, 2025-12-28 05:56:32, 2025-12-28 05:56:32))

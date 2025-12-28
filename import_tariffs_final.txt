@@ -1,0 +1,92 @@
+Starting Import...
+Processing row: {"proveedor":null,"zona":"Zona hotelera - cancun","pasajeros":"1 a 8","costo_mayorista":1000,"4":null,"precio_publico":"=SUM(I2+(I2*0.12))","costo_publico_promo":"=SUM(I2+(I2*0.15))"}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+SQL: insert into "providers" ("name", "is_default", "is_active", "updated_at", "created_at") values (?, ?, ?, ?, ?) [Enjoy Transfers, 1, 1, 2025-12-28 05:59:09, 2025-12-28 05:59:09]
+SQL: insert into "tariffs" ("provider_id", "zone", "pax", "cost", "price", "updated_at", "created_at") values (?, ?, ?, ?, ?, ?, ?) [2, Zona hotelera - cancun, 1 a 8, 1000, 1100, 2025-12-28 05:59:09, 2025-12-28 05:59:09]
+Processing row: {"proveedor":null,"zona":"Puerto Juarez - muelle - al ritmo","pasajeros":"1 a 8","costo_mayorista":1000,"4":null,"precio_publico":"=SUM(I3+(I3*0.12))","costo_publico_promo":"=SUM(I3+(I3*0.15))"}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+SQL: insert into "tariffs" ("provider_id", "zone", "pax", "cost", "price", "updated_at", "created_at") values (?, ?, ?, ?, ?, ?, ?) [2, Puerto Juarez - muelle - al ritmo, 1 a 8, 1000, 1100, 2025-12-28 05:59:09, 2025-12-28 05:59:09]
+Processing row: {"proveedor":null,"zona":"Playa mujeres - Costa mujeres","pasajeros":"1 a 8","costo_mayorista":1200,"4":null,"precio_publico":"=SUM(I4+(I4*0.12))","costo_publico_promo":"=SUM(I4+(I4*0.15))"}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+SQL: insert into "tariffs" ("provider_id", "zone", "pax", "cost", "price", "updated_at", "created_at") values (?, ?, ?, ?, ?, ?, ?) [2, Playa mujeres - Costa mujeres, 1 a 8, 1200, 1320, 2025-12-28 05:59:09, 2025-12-28 05:59:09]
+Processing row: {"proveedor":null,"zona":"Puerto Morelos","pasajeros":"1 a 8","costo_mayorista":1200,"4":null,"precio_publico":"=SUM(I5+(I5*0.12))","costo_publico_promo":"=SUM(I5+(I5*0.15))"}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+SQL: insert into "tariffs" ("provider_id", "zone", "pax", "cost", "price", "updated_at", "created_at") values (?, ?, ?, ?, ?, ?, ?) [2, Puerto Morelos, 1 a 8, 1200, 1320, 2025-12-28 05:59:09, 2025-12-28 05:59:09]
+Processing row: {"proveedor":null,"zona":"Playa del carmen - Playa car","pasajeros":"1 a 8","costo_mayorista":1600,"4":null,"precio_publico":"=SUM(I6+(I6*0.12))","costo_publico_promo":"=SUM(I6+(I6*0.15))"}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+SQL: insert into "tariffs" ("provider_id", "zone", "pax", "cost", "price", "updated_at", "created_at") values (?, ?, ?, ?, ?, ?, ?) [2, Playa del carmen - Playa car, 1 a 8, 1600, 1760, 2025-12-28 05:59:09, 2025-12-28 05:59:09]
+Processing row: {"proveedor":null,"zona":"Puerto Aventuras","pasajeros":"1 a 8","costo_mayorista":1700,"4":null,"precio_publico":"=SUM(I7+(I7*0.12))","costo_publico_promo":"=SUM(I7+(I7*0.15))"}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+SQL: insert into "tariffs" ("provider_id", "zone", "pax", "cost", "price", "updated_at", "created_at") values (?, ?, ?, ?, ?, ?, ?) [2, Puerto Aventuras, 1 a 8, 1700, 1870, 2025-12-28 05:59:09, 2025-12-28 05:59:09]
+Processing row: {"proveedor":null,"zona":"Akumal","pasajeros":"1 a 8","costo_mayorista":1800,"4":null,"precio_publico":"=SUM(I8+(I8*0.12))","costo_publico_promo":"=SUM(I8+(I8*0.15))"}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+SQL: insert into "tariffs" ("provider_id", "zone", "pax", "cost", "price", "updated_at", "created_at") values (?, ?, ?, ?, ?, ?, ?) [2, Akumal, 1 a 8, 1800, 1980, 2025-12-28 05:59:09, 2025-12-28 05:59:09]
+Processing row: {"proveedor":null,"zona":"Tulum","pasajeros":"1 a 8","costo_mayorista":2250,"4":null,"precio_publico":"=SUM(I9+(I9*0.12))","costo_publico_promo":"=SUM(I9+(I9*0.15))"}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+SQL: insert into "tariffs" ("provider_id", "zone", "pax", "cost", "price", "updated_at", "created_at") values (?, ?, ?, ?, ?, ?, ?) [2, Tulum, 1 a 8, 2250, 2475, 2025-12-28 05:59:09, 2025-12-28 05:59:09]
+Processing row: {"proveedor":null,"zona":"Zona hotelera - cancun","pasajeros":"1 a 6","costo_mayorista":1500,"4":null,"precio_publico":"=SUM(I10+(I10*0.12))","costo_publico_promo":"=SUM(I10+(I10*0.15))"}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+SQL: insert into "tariffs" ("provider_id", "zone", "pax", "cost", "price", "updated_at", "created_at") values (?, ?, ?, ?, ?, ?, ?) [2, Zona hotelera - cancun, 1 a 6, 1500, 1650, 2025-12-28 05:59:09, 2025-12-28 05:59:09]
+Processing row: {"proveedor":null,"zona":"Playa mujeres - Costa mujeres","pasajeros":"1 a 6","costo_mayorista":1700,"4":null,"precio_publico":"=SUM(I11+(I11*0.12))","costo_publico_promo":"=SUM(I11+(I11*0.15))"}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+SQL: insert into "tariffs" ("provider_id", "zone", "pax", "cost", "price", "updated_at", "created_at") values (?, ?, ?, ?, ?, ?, ?) [2, Playa mujeres - Costa mujeres, 1 a 6, 1700, 1870, 2025-12-28 05:59:09, 2025-12-28 05:59:09]
+Processing row: {"proveedor":null,"zona":"Puerto Morelos","pasajeros":"1 a 6","costo_mayorista":1650,"4":null,"precio_publico":"=SUM(I12+(I12*0.12))","costo_publico_promo":"=SUM(I12+(I12*0.15))"}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+SQL: insert into "tariffs" ("provider_id", "zone", "pax", "cost", "price", "updated_at", "created_at") values (?, ?, ?, ?, ?, ?, ?) [2, Puerto Morelos, 1 a 6, 1650, 1815, 2025-12-28 05:59:09, 2025-12-28 05:59:09]
+Processing row: {"proveedor":null,"zona":"Playa del carme ","pasajeros":"1 a 6","costo_mayorista":1900,"4":null,"precio_publico":"=SUM(I13+(I13*0.12))","costo_publico_promo":"=SUM(I13+(I13*0.15))"}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+SQL: insert into "tariffs" ("provider_id", "zone", "pax", "cost", "price", "updated_at", "created_at") values (?, ?, ?, ?, ?, ?, ?) [2, Playa del carme , 1 a 6, 1900, 2090, 2025-12-28 05:59:09, 2025-12-28 05:59:09]
+Processing row: {"proveedor":null,"zona":"Puerto aventuras","pasajeros":"1 a 6","costo_mayorista":2250,"4":null,"precio_publico":"=SUM(I14+(I14*0.12))","costo_publico_promo":"=SUM(I14+(I14*0.15))"}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+SQL: insert into "tariffs" ("provider_id", "zone", "pax", "cost", "price", "updated_at", "created_at") values (?, ?, ?, ?, ?, ?, ?) [2, Puerto aventuras, 1 a 6, 2250, 2475, 2025-12-28 05:59:09, 2025-12-28 05:59:09]
+Processing row: {"proveedor":null,"zona":"Akumal","pasajeros":"1 a 6","costo_mayorista":2300,"4":null,"precio_publico":"=SUM(I15+(I15*0.12))","costo_publico_promo":"=SUM(I15+(I15*0.15))"}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+SQL: insert into "tariffs" ("provider_id", "zone", "pax", "cost", "price", "updated_at", "created_at") values (?, ?, ?, ?, ?, ?, ?) [2, Akumal, 1 a 6, 2300, 2530, 2025-12-28 05:59:09, 2025-12-28 05:59:09]
+Processing row: {"proveedor":null,"zona":"Tulum  ","pasajeros":"1 a 6","costo_mayorista":3100,"4":null,"precio_publico":"=SUM(I16+(I16*0.12))","costo_publico_promo":"=SUM(I16+(I16*0.15))"}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+SQL: insert into "tariffs" ("provider_id", "zone", "pax", "cost", "price", "updated_at", "created_at") values (?, ?, ?, ?, ?, ?, ?) [2, Tulum  , 1 a 6, 3100, 3410, 2025-12-28 05:59:09, 2025-12-28 05:59:09]
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+Processing row: {"proveedor":null,"zona":null,"pasajeros":null,"costo_mayorista":null,"4":null,"precio_publico":null,"costo_publico_promo":null}
+SQL: select * from "providers" where ("name" = ?) limit 1 [Enjoy Transfers]
+Import Success.
+SQL: select count(*) as aggregate from "providers" []
+Providers: 2
+SQL: select count(*) as aggregate from "tariffs" []
+Tariffs: 15
+SQL: select * from "providers" where "is_default" = ? limit 1 [1]
+Default Provider: Enjoy Transfers
