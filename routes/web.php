@@ -103,3 +103,6 @@ Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.s
 Route::get('/debug-data', function () {
     return ['services' => \App\Models\Service::all()];
 });
+
+Route::get('/search', [App\Http\Controllers\SearchController::class, 'index'])->name('search');
+

@@ -103,7 +103,7 @@ watch(() => page.props.flash, (flash) => {
                         <!-- Logo -->
                         <div class="shrink-0 flex items-center">
                             <Link href="/" class="text-2xl font-serif font-bold text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition">
-                                Conecta Contigo
+                                Cancun Sunny
                             </Link>
                         </div>
 
@@ -214,7 +214,7 @@ watch(() => page.props.flash, (flash) => {
             <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                     <div class="md:col-span-1">
-                        <h3 class="text-xl font-serif font-bold mb-4 text-white">TherapyApp</h3>
+                        <h3 class="text-xl font-serif font-bold mb-4 text-white">Cancun Sunny</h3>
                         <p class="text-secondary-400 text-sm leading-relaxed">
                             {{ $t('footer.description') }}
                         </p>
@@ -231,36 +231,19 @@ watch(() => page.props.flash, (flash) => {
                         <h4 class="text-lg font-semibold mb-4 text-white">{{ $t('footer.contact') }}</h4>
                         <ul class="space-y-2 text-sm text-secondary-400">
                             <li>123 Wellness Blvd</li>
-                            <li>City, State 12345</li>
-                            <li>contact@therapyapp.com</li>
+                            <li>Cancun, Quintana Roo</li>
+                            <li>contact@cancunsunny.com</li>
                         </ul>
                     </div>
                     <div>
                         <h4 class="text-lg font-semibold mb-4 text-white">{{ $t('footer.social') }}</h4>
                         <div class="flex space-x-4">
-                            <a href="#" class="text-secondary-400 hover:text-primary-400 transition">
-                                <span class="sr-only">Facebook</span>
-                                <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                    <path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd" />
-                                </svg>
-                            </a>
-                            <a href="#" class="text-secondary-400 hover:text-primary-400 transition">
-                                <span class="sr-only">Instagram</span>
-                                <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                    <path fill-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772 4.902 4.902 0 011.772-1.153c.636-.247 1.363-.416 2.427-.465C9.673 2.013 10.03 2 12.48 2h.165zm-1.99 1.99c-2.444.01-2.753.023-3.61.063-.853.039-1.316.173-1.624.293-.406.158-.695.346-.998.649-.303.303-.491.592-.649.998-.12.308-.254.771-.293 1.624-.04.857-.053 1.166-.063 3.61v.2c.01 2.444.023 2.753.063 3.61.039.853.173 1.316.293 1.624.158.406.346.695.649.998.303.303.592.491.998.649.308.12.771.254 1.624.293.857.04 1.166.053 3.61.063h.2c2.444-.01 2.753-.023 3.61-.063.853-.039 1.316-.173 1.624-.293.406-.158.695-.346.998-.649.303-.303.491-.592.649-.998.12-.308.254-.771.293-1.624.04-.857.053-1.166.063-3.61v-.2c-.01-2.444-.023-2.753-.063-3.61-.039-.853-.173-1.316-.293-1.624-.158-.406-.346-.695-.649-.998-.303-.303-.592-.491-.998-.649-.308-.12-.771-.254-1.624-.293-.857-.04-1.166-.053-3.61-.063h-.2zm-3.18 3.06a1.44 1.44 0 110 2.88 1.44 1.44 0 010-2.88zm5.17 1.12c-2.761 0-5 2.239-5 5s2.239 5 5 5 5-2.239 5-5-2.239-5-5-5zm0 2c1.657 0 3 1.343 3 3s-1.343 3-3 3-3-1.343-3-3 1.343-3 3-3z" clip-rule="evenodd" />
-                                </svg>
-                            </a>
-                            <a href="#" class="text-secondary-400 hover:text-primary-400 transition">
-                                <span class="sr-only">TikTok</span>
-                                <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                    <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93v6.16c0 3.18-1.32 4.89-3.92 5.35-2.4.43-4.93-.5-6.07-2.65-1.18-2.23-.51-4.96 1.56-6.18 1.25-.74 2.69-.8 4.12-.25v4.48c-.25-.03-.5-.05-.75-.02-.85.09-1.51.71-1.62 1.55-.16 1.21 1.16 1.96 2.15 1.4 1.05-.6 1.35-1.84 1.32-3.07V4.6a7.18 7.18 0 003.13-4.58z"/>
-                                </svg>
-                            </a>
+                            <!-- Social Icons... -->
                         </div>
                     </div>                    
                 </div>
                 <div class="mt-8 pt-8 border-t border-secondary-800 text-center text-sm text-secondary-500">
-                    &copy; {{ new Date().getFullYear() }} TherapyApp. {{ $t('footer.rights') }}
+                    &copy; {{ new Date().getFullYear() }} Cancun Sunny. {{ $t('footer.rights') }}
                 </div>
             </div>
         </footer>

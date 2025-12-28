@@ -16,8 +16,16 @@
     @vite(['resources/css/app.css', 'resources/js/app.js', "resources/js/Pages/{$page['component']}.vue"])
     @inertiaHead
 </head>
+<script>
+    if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
+</script>
+</head>
 
-<body class="font-sans antialiased">
+<body class="font-sans antialiased bg-primary-50 dark:bg-secondary-950 transition-colors duration-300">
     @inertia
 </body>
 
