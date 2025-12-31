@@ -14,6 +14,7 @@ Route::get('/', function () {
     return Inertia::render('Welcome', [
         'featuredServices' => Service::where('is_active', true)->take(3)->get(),
         'latestPosts' => BlogPost::where('is_published', true)->latest('published_at')->take(3)->get(),
+        'zones' => \App\Models\Zone::pluck('name'),
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
@@ -26,7 +27,7 @@ Route::get('/shop', function () {
 Route::get('/services', function () {
     return Inertia::render('Services', [
         'services' => Service::where('is_active', true)
-            ->whereIn('type', ['individual', 'couple', 'family', 'workshop', 'conference', 'talk', 'training'])
+            ->whereIn('type', ['transfer', 'tour', 'private'])
             ->get()
     ]);
 });
@@ -87,7 +88,31 @@ Route::post('/blog/{slug}/like', [BlogController::class, 'like'])->name('blog.li
 Route::post('/blog/{slug}/save', [BlogController::class, 'save'])->name('blog.save')->middleware('auth');
 Route::post('/comments/{comment}/like', [BlogController::class, 'likeComment'])->name('comments.like');
 
-// Cart Routes
+// Admin Routes
+Route::prefix('admin')->group(function () {
+    Route::get('/login', [\App\Http\Controllers\Admin\AuthController::class, 'showLogin'])->name('admin.login');
+    Route::post('/login/attempt', [\App\Http\Controllers\Admin\AuthController::class, 'login'])->name('admin.login.attempt');
+    Route::post('/login/verify', [\App\Http\Controllers\Admin\AuthController::class, 'verifyTwoFactor'])->name('admin.login.verify');
+
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/dashboard', function () {
+            return Inertia::render('Admin/Dashboard');
+        })->name('admin.dashboard');
+
+        Route::post('/logout', [\App\Http\Controllers\Admin\AuthController::class, 'logout'])->name('admin.logout');
+
+        // Zone Editor
+        Route::get('/zones', [\App\Http\Controllers\Admin\ZoneController::class, 'index'])->name('admin.zones.index');
+        Route::post('/zones', [\App\Http\Controllers\Admin\ZoneController::class, 'store'])->name('admin.zones.store');
+        Route::put('/zones/{zone}', [\App\Http\Controllers\Admin\ZoneController::class, 'update'])->name('admin.zones.update');
+        Route::delete('/zones/{zone}', [\App\Http\Controllers\Admin\ZoneController::class, 'destroy'])->name('admin.zones.destroy');
+
+        // Profile
+        Route::get('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('admin.profile.edit');
+        Route::post('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('admin.profile.update');
+    });
+});
+
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 Route::delete('/cart/remove/{cartItem}', [CartController::class, 'remove'])->name('cart.remove');
@@ -105,4 +130,7 @@ Route::get('/debug-data', function () {
 });
 
 Route::get('/search', [App\Http\Controllers\SearchController::class, 'index'])->name('search');
+
+Route::get('/contact', [App\Http\Controllers\ContactController::class, 'index'])->name('contact.index');
+Route::post('/contact', [App\Http\Controllers\ContactController::class, 'store'])->name('contact.store');
 

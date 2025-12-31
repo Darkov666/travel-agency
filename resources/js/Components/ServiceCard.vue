@@ -31,7 +31,7 @@ const currencySymbol = computed(() => {
     return cartStore.currency === 'MXN' ? 'MX$' : 'US$';
 });
 
-const addToCart = async () => {
+const addToCart = async (shouldReload = true) => {
     console.log('Adding to cart (axios):', props.service.id);
     try {
         const response = await axios.post('/cart/add', {
@@ -39,15 +39,23 @@ const addToCart = async () => {
             quantity: 1
         });
         console.log('Added to cart successfully', response.data);
-        // Reload page to update cart count (or use store if we had one synced)
-        window.location.reload(); 
+        if (shouldReload) {
+            window.location.reload();
+        }
     } catch (error) {
         console.error('Error adding to cart:', error);
         alert('Error al agregar al carrito: ' + (error.response?.data?.message || error.message));
     }
 };
 
-const bookNow = () => {
+const bookNow = async () => {
+    if (props.isProduct) {
+        // For products, "Buy Now" means Add to Cart + Go to Cart
+        await addToCart(false); // Pass false to prevent reload if we redirect
+        router.visit('/cart');
+        return;
+    }
+
     const title = props.service.title.toLowerCase();
     const type = props.service.type;
     let route = '/booking/individual';
@@ -72,7 +80,7 @@ const bookSpecial = () => {
 </script>
 
 <template>
-    <div class="bg-primary-50 dark:bg-secondary-800 rounded-xl overflow-hidden hover:shadow-lg transition duration-300 border border-primary-100 dark:border-secondary-700 flex flex-col h-full">
+    <div class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden hover:shadow-lg transition duration-300 border-2 border-gray-100 dark:border-gray-700 flex flex-col h-full">
         <!-- Image or Video -->
         <div class="h-48 w-full overflow-hidden relative group">
             <img 
@@ -95,25 +103,25 @@ const bookSpecial = () => {
                     </svg>
                 </div>
             </div>
-            <div v-else class="w-full h-full bg-secondary-200 dark:bg-secondary-700 flex items-center justify-center">
-                <svg class="h-12 w-12 text-secondary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div v-else class="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                <svg class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
             </div>
         </div>
 
         <div class="p-8 flex flex-col flex-grow">
-            <h3 class="text-xl font-bold text-secondary-900 dark:text-white mb-3">{{ service.title }}</h3>
-            <p class="text-secondary-600 dark:text-secondary-300 mb-6 line-clamp-3 flex-grow">{{ service.description }}</p>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">{{ service.title }}</h3>
+            <p class="text-gray-600 dark:text-gray-300 mb-6 line-clamp-3 flex-grow">{{ service.description }}</p>
         
             <div class="mt-auto space-y-4">
                 <div class="mt-4 flex flex-col gap-4">
                     <div class="flex items-center justify-between">
-                        <span v-if="!isSpecial && !['workshop', 'conference', 'talk', 'training'].includes(service.type)" class="text-2xl font-bold text-primary-600">
+                        <span v-if="!isSpecial && !['workshop', 'conference', 'talk', 'training'].includes(service.type)" class="text-2xl font-bold text-cyan-600 dark:text-cyan-400">
                             {{ currencySymbol }}{{ price }}
-                            <span v-if="!isProduct" class="text-sm text-secondary-500 font-normal">/ {{ service.duration_minutes }}m</span>
+                            <span v-if="!isProduct" class="text-sm text-gray-500 font-normal">/ {{ service.duration_minutes }}m</span>
                         </span>
-                        <span v-else-if="isSpecial" class="text-xl font-bold text-primary-600">
+                        <span v-else-if="isSpecial" class="text-xl font-bold text-cyan-600 dark:text-cyan-400">
                             Cotizar
                         </span>
                         <!-- Workshop: No price shown -->
@@ -121,16 +129,16 @@ const bookSpecial = () => {
                     
                     <div class="flex gap-2">
                         <button 
-                            v-if="!isSpecial && !isProduct && !['workshop', 'conference', 'talk', 'training'].includes(service.type)"
-                            @click="addToCart"
-                            class="flex-1 px-3 py-2 border border-primary-600 text-primary-600 rounded-lg hover:bg-primary-50 transition font-medium text-sm text-center"
+                            v-if="!isSpecial && !['workshop', 'conference', 'talk', 'training'].includes(service.type)"
+                            @click="addToCart()"
+                            class="flex-1 px-3 py-2 border border-cyan-600 text-cyan-600 dark:border-cyan-400 dark:text-cyan-400 rounded-lg hover:bg-cyan-50 dark:hover:bg-gray-700 transition font-medium text-sm text-center"
                         >
                             {{ t('services.add_to_cart') }}
                         </button>
 
                         <button 
                             @click="isSpecial ? bookSpecial() : bookNow()"
-                            class="flex-1 px-3 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition font-medium text-sm shadow-sm text-center"
+                            class="flex-1 px-3 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition font-medium text-sm shadow-sm text-center"
                         >
                             {{ 
                                 isSpecial ? 'Agendar Consulta' : 
@@ -142,7 +150,7 @@ const bookSpecial = () => {
                 </div>
                 
                 <div class="text-center pt-2">
-                    <Link :href="`/services`" class="text-secondary-500 hover:text-primary-600 dark:text-secondary-400 dark:hover:text-primary-300 text-sm underline">
+                    <Link :href="`/services`" class="text-gray-500 hover:text-cyan-600 dark:text-gray-400 dark:hover:text-cyan-300 text-sm underline">
                         {{ t('services.learn_more') }}
                     </Link>
                 </div>

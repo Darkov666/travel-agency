@@ -7,11 +7,10 @@ import ServiceCard from '@/Components/ServiceCard.vue';
 const selectedCategory = ref('all');
 
 const categories = [
-    { id: 'all', name: 'shop.all' },
-    { id: 'individual', name: 'gallery.individual' },
-    { id: 'couples', name: 'services.couples' },
-    { id: 'family', name: 'services.family' },
-    { id: 'workshops', name: 'gallery.workshops' },
+    { id: 'all', name: 'services.all' },
+    { id: 'transfer', name: 'services.transfers' },
+    { id: 'tour', name: 'services.tours' },
+    { id: 'private', name: 'services.private' },
 ];
 
 const props = defineProps({
@@ -39,7 +38,7 @@ const filteredServices = computed(() => {
     <Head :title="$t('services.title')" />
 
     <MainLayout>
-        <div class="py-12 bg-gray-50 dark:bg-secondary-900 min-h-screen transition-colors duration-300">
+        <div class="py-12 bg-primary-50 dark:bg-secondary-950 min-h-screen transition-colors duration-300">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-12">
                     <h1 class="text-4xl font-serif font-bold text-secondary-900 dark:text-white mb-4">{{ $t('services.title') }}</h1>
@@ -53,10 +52,10 @@ const filteredServices = computed(() => {
                         :key="category.id"
                         @click="selectedCategory = category.id"
                         :class="[
-                            'px-6 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap',
+                            'px-6 py-2 rounded-full text-sm font-bold transition-colors whitespace-nowrap border-2',
                             selectedCategory === category.id 
-                                ? 'bg-primary-600 text-white shadow-md' 
-                                : 'bg-white dark:bg-secondary-800 text-secondary-600 dark:text-secondary-300 hover:bg-primary-50 dark:hover:bg-secondary-700'
+                                ? 'bg-cyan-600 border-cyan-600 text-white shadow-md' 
+                                : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
                         ]"
                     >
                         {{ $t(category.name) }}

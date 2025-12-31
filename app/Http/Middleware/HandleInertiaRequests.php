@@ -47,6 +47,9 @@ class HandleInertiaRequests extends Middleware
 
         return [
             ...parent::share($request),
+            'auth' => [
+                'user' => $request->user(),
+            ],
             'cartCount' => $cartCount,
             'locale' => app()->getLocale(),
             'flash' => [

@@ -1,0 +1,275 @@
+<script setup>
+import AdminLayout from '@/Layouts/AdminLayout.vue';
+import { Head, useForm, router } from '@inertiajs/vue3';
+import { onMounted, ref, watch } from 'vue';
+
+const props = defineProps({
+    zones: Array
+});
+
+const mapContainer = ref(null);
+let map = null;
+let drawingManager = null;
+let polygons = []; // Store references to drawn polygons to handle selection/editing
+
+const editingZone = ref(null); // The zone currently being edited (or new)
+const showModal = ref(false);
+
+const form = useForm({
+    id: null,
+    name: '',
+    priority: 0,
+    color: '#3b82f6',
+    coordinates: null
+});
+
+// Load Google Maps with Drawing Library
+const loadMaps = () => {
+    if (window.google && window.google.maps) {
+        initMap();
+        return;
+    }
+
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=drawing`;
+    script.async = true;
+    script.defer = true;
+    script.onload = initMap;
+    document.head.appendChild(script);
+};
+
+const initMap = () => {
+    map = new google.maps.Map(mapContainer.value, {
+        center: { lat: 20.65, lng: -87.10 }, // Riviera Maya center
+        zoom: 9,
+        streetViewControl: false,
+    });
+
+    drawingManager = new google.maps.drawing.DrawingManager({
+        drawingMode: null, // Start with no tool selected
+        drawingControl: true,
+        drawingControlOptions: {
+            position: google.maps.ControlPosition.TOP_CENTER,
+            drawingModes: ['polygon'],
+        },
+        polygonOptions: {
+            fillColor: '#3b82f6',
+            fillOpacity: 0.3,
+            strokeWeight: 2,
+            clickable: true,
+            editable: true,
+            zIndex: 1
+        },
+    });
+
+    drawingManager.setMap(map);
+
+    // Event: Polygon Completed
+    google.maps.event.addListener(drawingManager, 'polygoncomplete', (polygon) => {
+        // Clear drawing mode
+        drawingManager.setDrawingMode(null);
+        
+        // Open modal to save new zone
+        editingZone.value = { isNew: true, polygon: polygon };
+        form.reset();
+        form.coordinates = getPolygonCoords(polygon);
+        showModal.value = true;
+        
+        // Add listeners to this new polygon
+        addPolygonListeners(polygon);
+    });
+
+    // Load existing zones
+    loadZonesOnMap();
+};
+
+const loadZonesOnMap = () => {
+    // Clear existing
+    polygons.forEach(p => p.setMap(null));
+    polygons = [];
+
+    props.zones.forEach(zone => {
+        if (!zone.coordinates) return;
+        
+        const paths = JSON.parse(zone.coordinates);
+        const polygon = new google.maps.Polygon({
+            paths: paths,
+            fillColor: zone.color,
+            fillOpacity: 0.35,
+            strokeColor: zone.color,
+            strokeWeight: 2,
+            editable: false, // Default not editable until selected? Or maybe always editable? Let's make toggle?
+                             // For simplicity: Click to Edit.
+            map: map,
+            zIndex: zone.priority
+        });
+
+        // Attach data to polygon object for easy access
+        polygon.zoneData = zone;
+        
+        addPolygonListeners(polygon);
+        polygons.push(polygon);
+    });
+};
+
+const addPolygonListeners = (polygon) => {
+    google.maps.event.addListener(polygon, 'click', () => {
+        if (polygon.zoneData) {
+            editZone(polygon.zoneData, polygon);
+        } else {
+            // It's a newly drawn one that hasn't been saved?
+            // Usually handled by 'polygoncomplete', but if canceled modal, we might have issue.
+            // For now, assume clicked = edit existing.
+        }
+    });
+
+    // Update coordinates when edited
+    const updateCoords = () => {
+        if (editingZone.value && editingZone.value.polygon === polygon) {
+            form.coordinates = getPolygonCoords(polygon);
+        }
+    };
+    polygon.getPath().addListener('set_at', updateCoords);
+    polygon.getPath().addListener('insert_at', updateCoords);
+    polygon.getPath().addListener('remove_at', updateCoords);
+};
+
+const getPolygonCoords = (polygon) => {
+    const len = polygon.getPath().getLength();
+    const htmlCoords = [];
+    for (let i = 0; i < len; i++) {
+        htmlCoords.push({
+            lat: polygon.getPath().getAt(i).lat(),
+            lng: polygon.getPath().getAt(i).lng()
+        });
+    }
+    return JSON.stringify(htmlCoords);
+};
+
+const editZone = (zone, polygon) => {
+    editingZone.value = { isNew: false, polygon: polygon };
+    
+    form.id = zone.id;
+    form.name = zone.name;
+    form.priority = zone.priority;
+    form.color = zone.color;
+    form.coordinates = zone.coordinates; // Keep existing unless edited
+    
+    // Enable editing on map
+    polygons.forEach(p => p.setEditable(false)); // Disable others
+    polygon.setEditable(true);
+
+    showModal.value = true;
+};
+
+const saveZone = () => {
+    if (editingZone.value.isNew) {
+        form.post(route('admin.zones.store'), {
+            onSuccess: () => {
+                closeModal(true);
+            }
+        });
+    } else {
+        form.put(route('admin.zones.update', form.id), {
+            onSuccess: () => {
+                closeModal(true);
+            }
+        });
+    }
+};
+
+const deleteZone = () => {
+    if (!confirm('Are you sure you want to delete this zone?')) return;
+    
+    form.delete(route('admin.zones.destroy', form.id), {
+        onSuccess: () => {
+            if (editingZone.value.polygon) {
+                editingZone.value.polygon.setMap(null);
+            }
+            closeModal(true);
+        }
+    });
+};
+
+const closeModal = (reload = false) => {
+    showModal.value = false;
+    if (editingZone.value && editingZone.value.polygon) {
+        editingZone.value.polygon.setEditable(false);
+        // If new and cancelled (not reloaded), remove it
+        if (editingZone.value.isNew && !reload) {
+            editingZone.value.polygon.setMap(null);
+        }
+    }
+    editingZone.value = null;
+    form.reset();
+    
+    if (reload) {
+        // Props updated automatically by Inertia, reload map items
+        // Wait for next tick? Use Watcher?
+    }
+};
+
+// Watch for zones prop change to refresh map
+watch(() => props.zones, () => {
+    loadZonesOnMap();
+}, { deep: true });
+
+onMounted(() => {
+    loadMaps();
+});
+</script>
+
+<template>
+    <Head title="Zone Editor" />
+
+    <AdminLayout>
+        <template #header>
+            <div class="flex justify-between items-center">
+                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                    Zone Editor
+                </h2>
+                <div class="text-sm text-gray-500">
+                    Use the toolbar to draw polygons. Click a zone to edit.
+                </div>
+            </div>
+        </template>
+
+        <div class="h-[calc(100vh-180px)] w-full relative">
+            <div ref="mapContainer" class="w-full h-full"></div>
+
+            <!-- Edit Modal -->
+            <div v-if="showModal" class="absolute top-4 right-4 w-80 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-xl z-10">
+                <h3 class="font-bold text-lg mb-4 text-gray-800 dark:text-white">
+                    {{ editingZone?.isNew ? 'New Zone' : 'Edit Zone' }}
+                </h3>
+                
+                <form @submit.prevent="saveZone">
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold mb-1 text-gray-700 dark:text-gray-300">Name</label>
+                        <input v-model="form.name" type="text" class="w-full rounded border-gray-300 dark:bg-gray-700 dark:text-white" required>
+                    </div>
+
+                    <div class="mb-4">
+                         <label class="block text-sm font-bold mb-1 text-gray-700 dark:text-gray-300">
+                            Priority <span class="font-normal text-xs text-gray-500">(Higher wins)</span>
+                        </label>
+                        <input v-model="form.priority" type="number" class="w-full rounded border-gray-300 dark:bg-gray-700 dark:text-white">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold mb-1 text-gray-700 dark:text-gray-300">Color</label>
+                        <input v-model="form.color" type="color" class="w-full h-10 rounded border-gray-300">
+                    </div>
+
+                    <div class="flex justify-between mt-6">
+                        <button type="button" @click="closeModal(false)" class="text-gray-500 hover:text-gray-700">Cancel</button>
+                        <div>
+                            <button v-if="!editingZone.isNew" type="button" @click="deleteZone" class="text-red-500 mr-4 hover:text-red-700">Delete</button>
+                            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </AdminLayout>
+</template>

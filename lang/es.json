@@ -10,5 +10,18 @@
     "footer.quick_links": "Enlaces Rápidos",
     "footer.contact": "Contacto",
     "footer.social": "Síguenos",
-    "footer.rights": "Todos los derechos reservados."
+    "footer.rights": "Todos los derechos reservados.",
+    "shop.title": "Paquetes y Tours",
+    "shop.subtitle": "Explora nuestras ofertas exclusivas y mercancía oficial.",
+    "shop.all": "Todos",
+    "shop.tours": "Tours",
+    "shop.packages": "Paquetes",
+    "shop.merchandise": "Mercancía",
+    "shop.no_products": "No se encontraron productos.",
+    "services.title": "Nuestros Servicios",
+    "services.subtitle": "Transporte de lujo y experiencias personalizadas.",
+    "services.all": "Todos",
+    "services.transfers": "Traslados",
+    "services.tours": "Excursiones",
+    "services.private": "Servicio Privado"
 }

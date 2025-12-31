@@ -13,58 +13,57 @@ const selectedCategory = ref('all');
 
 const categories = [
     { id: 'all', name: 'shop.all' },
-    { id: 'ebook', name: 'shop.ebooks' },
-    { id: 'video', name: 'shop.videos' },
-    { id: 'manual', name: 'shop.manuals' },
+    { id: 'tours', name: 'shop.tours' },
+    { id: 'packages', name: 'shop.packages' },
+    { id: 'merchandise', name: 'shop.merchandise' },
 ];
 
 // Mock Data
 const products = [
     {
         id: 101,
-        title: 'Guía de Ansiedad',
-        description: 'Un eBook completo para entender y manejar la ansiedad en el día a día.',
-        price: 299,
-        currency: 'MXN',
-        type: 'ebook',
-        image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=800&auto=format&fit=crop'
+        title: 'Chichen Itza Deluxe Tour',
+        description: 'Guided tour to the wonder of the world with buffet lunch and cenote visit included.',
+        price: 129,
+        currency: 'USD',
+        type: 'tours',
+        image: 'https://images.unsplash.com/photo-1518638151313-982d2ba5011b?q=80&w=800&auto=format&fit=crop'
     },
     {
         id: 102,
-        title: 'Masterclass: Autoestima',
-        description: 'Video curso de 2 horas sobre cómo construir una autoestima sólida.',
-        price: 599,
-        currency: 'MXN',
-        type: 'video',
-        image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=800&auto=format&fit=crop',
-        video_url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbDN6eW56eW56eW56eW56eW56eW56eW56eW56eW56eW56eSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKr3nzbh5WgCFxe/giphy.gif'
+        title: 'Xcaret Plus Package',
+        description: 'Full day access to Xcaret park with buffet lunch and night show.',
+        price: 159,
+        currency: 'USD',
+        type: 'packages',
+        image: 'https://images.unsplash.com/photo-1534151759604-03738dbb772c?q=80&w=800&auto=format&fit=crop'
     },
     {
         id: 103,
-        title: 'Manual de Terapia Cognitiva',
-        description: 'Manual técnico para estudiantes y profesionales de la salud mental.',
-        price: 450,
-        currency: 'MXN',
-        type: 'manual',
-        image: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=800&auto=format&fit=crop'
+        title: 'Catamaran to Isla Mujeres',
+        description: 'Sail the Caribbean sea, snorkel in the reef and enjoy an open bar.',
+        price: 89,
+        currency: 'USD',
+        type: 'tours',
+        image: 'https://images.unsplash.com/photo-1544551763-46a42a46e865?q=80&w=800&auto=format&fit=crop'
     },
     {
         id: 104,
-        title: 'Meditaciones Guiadas',
-        description: 'Pack de 10 videos con meditaciones para dormir y relajarse.',
-        price: 350,
-        currency: 'MXN',
-        type: 'video',
-        image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=800&auto=format&fit=crop'
+        title: 'Cancun Sunny Cap',
+        description: 'Exclusive branded cap to protect you from the sun in style.',
+        price: 25,
+        currency: 'USD',
+        type: 'merchandise',
+        image: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?q=80&w=800&auto=format&fit=crop'
     },
     {
         id: 105,
-        title: 'Diario de Gratitud',
-        description: 'eBook interactivo para practicar la gratitud diariamente.',
-        price: 150,
-        currency: 'MXN',
-        type: 'ebook',
-        image: 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?q=80&w=800&auto=format&fit=crop'
+        title: 'Tulum & Coba Expedition',
+        description: 'Explore two ancient Mayan cities in one day. Transport and guide included.',
+        price: 110,
+        currency: 'USD',
+        type: 'tours',
+        image: 'https://images.unsplash.com/photo-1506869640319-fe1a24fd76dc?q=80&w=800&auto=format&fit=crop'
     }
 ];
 
@@ -80,7 +79,7 @@ const filteredProducts = computed(() => {
     <Head :title="$t('shop.title')" />
 
     <MainLayout>
-        <div class="py-12 bg-gray-50 dark:bg-secondary-900 min-h-screen transition-colors duration-300">
+        <div class="py-12 bg-primary-50 dark:bg-secondary-950 min-h-screen transition-colors duration-300">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-12">
                     <h1 class="text-4xl font-serif font-bold text-secondary-900 dark:text-white mb-4">{{ $t('shop.title') }}</h1>
@@ -94,10 +93,10 @@ const filteredProducts = computed(() => {
                         :key="category.id"
                         @click="selectedCategory = category.id"
                         :class="[
-                            'px-6 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap',
+                            'px-6 py-2 rounded-full text-sm font-bold transition-colors whitespace-nowrap border-2',
                             selectedCategory === category.id 
-                                ? 'bg-primary-600 text-white shadow-md' 
-                                : 'bg-white dark:bg-secondary-800 text-secondary-600 dark:text-secondary-300 hover:bg-primary-50 dark:hover:bg-secondary-700'
+                                ? 'bg-cyan-600 border-cyan-600 text-white shadow-md' 
+                                : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
                         ]"
                     >
                         {{ $t(category.name) }}

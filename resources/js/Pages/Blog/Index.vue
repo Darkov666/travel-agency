@@ -33,7 +33,7 @@ const selectTopic = (topicSlug) => {
     <Head title="Blog" />
 
     <MainLayout>
-        <div class="py-12 bg-gray-50 dark:bg-secondary-900 min-h-screen transition-colors duration-300">
+        <div class="py-12 bg-primary-50 dark:bg-secondary-950 min-h-screen transition-colors duration-300">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-12">
                     <h1 class="text-4xl font-serif font-bold text-secondary-900 dark:text-white mb-4">Nuestro Blog</h1>

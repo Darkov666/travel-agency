@@ -3,12 +3,14 @@ import { ref } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import MainLayout from '@/Layouts/MainLayout.vue';
 import SearchWidget from '@/Components/SearchWidget.vue';
+import ContactSection from '@/Components/ContactSection.vue';
 // import ServiceCard from '@/Components/ServiceCard.vue'; // Temporarily disabled until updated
 // import { wTrans } from 'laravel-vue-i18n';
 
 defineProps({
     featuredServices: Array,
     latestPosts: Array,
+    zones: Array,
 });
 
 // Using local image to ensure reliability
@@ -49,38 +51,38 @@ const ruinsImage = 'https://placehold.co/800x600/FF7F50/FFFFFF/png?text=Mayan+Ru
         </div>
 
         <!-- Search Widget (Floating overlap) -->
-        <SearchWidget />
+        <SearchWidget :zones="zones" />
 
         <!-- Value Propositions -->
-        <div class="py-16 bg-white dark:bg-gray-900 transition-colors duration-300">
+        <div class="py-16 bg-primary-50 dark:bg-gray-900 transition-colors duration-300">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-                    <div class="p-6 rounded-xl bg-secondary-50 dark:bg-gray-800 hover:shadow-lg transition">
-                        <div class="w-16 h-16 mx-auto bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center mb-4 text-primary-600 dark:text-primary-400">
+                    <div class="p-6 rounded-xl bg-white dark:bg-gray-800 hover:shadow-lg transition">
+                        <div class="w-16 h-16 mx-auto bg-cyan-100 dark:bg-cyan-900 rounded-full flex items-center justify-center mb-4 text-cyan-600 dark:text-cyan-400">
                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
-                        <h3 class="text-xl font-bold text-secondary-900 dark:text-gray-100 mb-2">Punctuality Guaranteed</h3>
-                        <p class="text-secondary-600 dark:text-gray-300">We track your flight to ensure we are there when you land. No waiting.</p>
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Punctuality Guaranteed</h3>
+                        <p class="text-gray-600 dark:text-gray-300">We track your flight to ensure we are there when you land. No waiting.</p>
                     </div>
-                     <div class="p-6 rounded-xl bg-secondary-50 dark:bg-gray-800 hover:shadow-lg transition">
-                        <div class="w-16 h-16 mx-auto bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center mb-4 text-primary-600 dark:text-primary-400">
+                     <div class="p-6 rounded-xl bg-white dark:bg-gray-800 hover:shadow-lg transition">
+                        <div class="w-16 h-16 mx-auto bg-cyan-100 dark:bg-cyan-900 rounded-full flex items-center justify-center mb-4 text-cyan-600 dark:text-cyan-400">
                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                             </svg>
                         </div>
-                        <h3 class="text-xl font-bold text-secondary-900 dark:text-gray-100 mb-2">Safe & Secure</h3>
-                        <p class="text-secondary-600 dark:text-gray-300">Certified drivers and sanitized luxury vehicles for your peace of mind.</p>
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Safe & Secure</h3>
+                        <p class="text-gray-600 dark:text-gray-300">Certified drivers and sanitized luxury vehicles for your peace of mind.</p>
                     </div>
-                     <div class="p-6 rounded-xl bg-secondary-50 dark:bg-gray-800 hover:shadow-lg transition">
-                        <div class="w-16 h-16 mx-auto bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center mb-4 text-primary-600 dark:text-primary-400">
+                     <div class="p-6 rounded-xl bg-white dark:bg-gray-800 hover:shadow-lg transition">
+                        <div class="w-16 h-16 mx-auto bg-cyan-100 dark:bg-cyan-900 rounded-full flex items-center justify-center mb-4 text-cyan-600 dark:text-cyan-400">
                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
-                        <h3 class="text-xl font-bold text-secondary-900 dark:text-gray-100 mb-2">Best Price</h3>
-                        <p class="text-secondary-600 dark:text-gray-300">Competitive rates with no hidden fees. Luxury service at fair prices.</p>
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Best Price</h3>
+                        <p class="text-gray-600 dark:text-gray-300">Competitive rates with no hidden fees. Luxury service at fair prices.</p>
                     </div>
                 </div>
             </div>
@@ -91,11 +93,11 @@ const ruinsImage = 'https://placehold.co/800x600/FF7F50/FFFFFF/png?text=Mayan+Ru
              <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <div class="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
                     <div>
-                        <h2 class="text-4xl font-serif font-bold text-secondary-900 dark:text-gray-100 mb-6">Explore the Ancient World</h2>
-                        <p class="text-lg text-secondary-600 dark:text-gray-300 mb-8">
+                        <h2 class="text-4xl font-serif font-bold text-gray-900 dark:text-white mb-6">Explore the Ancient World</h2>
+                        <p class="text-lg text-gray-600 dark:text-gray-300 mb-8">
                             Discover the magic of Chichen Itza, Tulum, and Coba with our private tours. We take you there in comfort and style, allowing you to explore at your own pace.
                         </p>
-                        <Link href="/services" class="text-primary-600 dark:text-primary-400 font-bold hover:text-primary-700 inline-flex items-center">
+                        <Link href="/services" class="text-cyan-600 dark:text-cyan-400 font-bold hover:text-cyan-700 dark:hover:text-cyan-300 inline-flex items-center transition-colors duration-300">
                             View All Tours <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
                         </Link>
                     </div>
@@ -111,7 +113,7 @@ const ruinsImage = 'https://placehold.co/800x600/FF7F50/FFFFFF/png?text=Mayan+Ru
         </div>
 
          <!-- Vehicle Fleet Section -->
-        <div class="py-20 bg-white dark:bg-gray-900 transition-colors duration-300">
+        <div class="py-20 bg-primary-50 dark:bg-gray-900 transition-colors duration-300">
              <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="lg:grid lg:grid-cols-2 lg:gap-16 items-center flex-row-reverse">
                     <div class="order-2 lg:order-1 mt-10 lg:mt-0">
@@ -120,8 +122,8 @@ const ruinsImage = 'https://placehold.co/800x600/FF7F50/FFFFFF/png?text=Mayan+Ru
                         </div>
                     </div>
                     <div class="order-1 lg:order-2">
-                        <h2 class="text-4xl font-serif font-bold text-secondary-900 dark:text-gray-100 mb-6">Travel in Luxury</h2>
-                        <p class="text-lg text-secondary-600 dark:text-gray-300 mb-8">
+                        <h2 class="text-4xl font-serif font-bold text-gray-900 dark:text-white mb-6">Travel in Luxury</h2>
+                        <p class="text-lg text-gray-600 dark:text-gray-300 mb-8">
                             Our fleet consists of modern, air-conditioned vehicles including private vans and luxury SUVs. Enjoy complimentary water and a smooth ride to your destination.
                         </p>
                          <ul class="space-y-4 mb-8">
@@ -142,6 +144,9 @@ const ruinsImage = 'https://placehold.co/800x600/FF7F50/FFFFFF/png?text=Mayan+Ru
                 </div>
             </div>
         </div>
+
+        <!-- Contact Section -->
+        <ContactSection />
 
     </MainLayout>
 </template>
