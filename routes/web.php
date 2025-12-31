@@ -123,6 +123,11 @@ Route::prefix('admin')->group(function () {
         Route::post('/provider-services', [\App\Http\Controllers\Admin\ProviderServiceController::class, 'store'])->name('admin.provider-services.store');
         Route::put('/provider-services/{providerService}', [\App\Http\Controllers\Admin\ProviderServiceController::class, 'update'])->name('admin.provider-services.update');
         Route::delete('/provider-services/{providerService}', [\App\Http\Controllers\Admin\ProviderServiceController::class, 'destroy'])->name('admin.provider-services.destroy');
+
+        // Reservations Operation
+        Route::get('/reservations', [\App\Http\Controllers\Admin\ReservationController::class, 'index'])->name('admin.reservations.index');
+        Route::post('/reservations/{item}/assign', [\App\Http\Controllers\Admin\ReservationController::class, 'assignProvider'])->name('admin.reservations.assign');
+        Route::post('/reservations/{item}/cancel-vendor', [\App\Http\Controllers\Admin\ReservationController::class, 'cancelProvider'])->name('admin.reservations.cancel_vendor');
     });
 });
 
@@ -143,6 +148,9 @@ Route::post('/checkout/{reservation}/pay', [CheckoutController::class, 'processP
 Route::get('/checkout/pending/{reservation}', [CheckoutController::class, 'pending'])->name('checkout.pending');
 // Admin Confirmation Route (Protected in real app, using GET for email link simplicity)
 Route::get('/admin/reservations/{reservation}/confirm', [CheckoutController::class, 'confirmPayment'])->name('admin.reservations.confirm');
+
+// Vendor Confirmation
+Route::get('/vendor/confirm/{token}', [App\Http\Controllers\VendorController::class, 'confirm'])->name('vendor.confirm');
 
 
 Route::get('/debug-data', function () {
