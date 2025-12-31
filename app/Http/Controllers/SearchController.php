@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Tariff;
+use App\Models\Tariff; // Legacy, kept if needed but not used
 use App\Models\Zone;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -21,7 +21,7 @@ class SearchController extends Controller
             'return_date' => 'nullable|required_if:type,round_trip|date|after_or_equal:date',
         ]);
 
-        $destination = $request->input('destination');
+        $destinationName = $request->input('destination');
         $pax = (int) $request->input('pax');
         $type = $request->input('type', 'one_way');
 
@@ -30,36 +30,63 @@ class SearchController extends Controller
         if ($coordinates && isset($coordinates['lat'], $coordinates['lng'])) {
             $matcher = new \App\Services\ZoneMatcher();
             $matchedZone = $matcher->match((float) $coordinates['lat'], (float) $coordinates['lng']);
-
             if ($matchedZone) {
-                // Override user selection with precise geofenced zone
-                $destination = $matchedZone->name;
+                // If precise match found, use its name
+                $destinationName = $matchedZone->name;
             }
         }
 
-        // Auto-save new zones (only if not found by matcher and provided by user)
-        if ($destination && !\App\Models\Zone::where('name', $destination)->exists()) {
-            \App\Models\Zone::create(['name' => $destination]);
+        // Find or Create Zone (Auto-learning names) - Only find for now to check services
+        $zone = \App\Models\Zone::where('name', $destinationName)->first();
+        if (!$zone) {
+            // If zone doesn't exist, created it but it will have no services
+            $zone = \App\Models\Zone::create(['name' => $destinationName]);
         }
 
-        // Fetch tariffs for the zone
-        // Since 'pax' is a string "1 a 8", we fetch all for the zone and filter in PHP
-        // Optimization: Normalize database columns in future
-        $tariffs = Tariff::with('provider')
-            ->where('zone', $destination)
-            ->get()
-            ->filter(function ($tariff) use ($pax) {
-                // Parse "X a Y"
-                if (preg_match('/(\d+)\s*a\s*(\d+)/', $tariff->pax, $matches)) {
-                    $min = (int) $matches[1];
-                    $max = (int) $matches[2];
-                    return $pax >= $min && $pax <= $max;
-                }
-                return false;
-            })->values();
+        // Fetch Search Results using Provider Logic
+        // 1. Get services for this zone
+        // 2. Filter active providers
+        // 3. Calculate units needed
+        $services = \App\Models\ProviderService::where('zone_id', $zone->id)
+            ->whereHas('provider', function ($query) {
+                $query->where('is_active', true)
+                    ->where('provider_type', 'transport'); // Only transport for now
+            })
+            ->with(['provider', 'service'])
+            ->get();
+
+        $results = $services->map(function ($service) use ($pax) {
+            // Unit Suggestion Logic
+            $unitCapacity = $service->max_pax ?? 10; // Default fallback
+            if ($unitCapacity <= 0)
+                $unitCapacity = 1; // Prevent div by zero
+
+            $unitsNeeded = ceil($pax / $unitCapacity);
+
+            // If we need multiple units, we show it
+            $totalPrice = $service->price_public * $unitsNeeded;
+            $totalCapacity = $unitCapacity * $unitsNeeded;
+
+            return [
+                'id' => $service->id,
+                'id' => $service->id,
+                'provider' => [
+                    'name' => $service->provider->name,
+                    'logo_path' => $service->provider->logo_path,
+                ],
+                'vehicle_image' => $service->provider->vehicles->where('type', 'van')->first()?->image_path, // Fallback logic or improve later to match service type map
+                // Display name: "Van" or custom name, plus unit count if > 1
+                // Display name: "Van" or custom name, plus unit count if > 1
+                'service_type' => ($service->name ?? $service->service?->title ?? 'Standard Transfer') . ($unitsNeeded > 1 ? " ({$unitsNeeded} Units)" : ""),
+                'pax' => $totalCapacity, // Show total capacity of the fleet
+                'price' => $totalPrice, // Show total price
+                'category' => $service->category, // standard/vip
+                'units' => $unitsNeeded, // Meta data
+            ];
+        })->sortBy('price')->values(); // Sort by cheapest
 
         return Inertia::render('SearchResults', [
-            'results' => $tariffs,
+            'results' => $results,
             'searchParams' => $request->all(),
         ]);
     }

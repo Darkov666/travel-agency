@@ -27,7 +27,8 @@ class CartController extends Controller
     public function index()
     {
         $cart = $this->getCart();
-        $cart->load('items.service');
+        $cart = $this->getCart();
+        $cart->load(['items.providerService.provider', 'items.providerService.service', 'items.providerService.zone']);
 
         return Inertia::render('Shop/Cart', [
             'cart' => $cart
@@ -38,24 +39,31 @@ class CartController extends Controller
     {
         \Illuminate\Support\Facades\Log::info('Cart Add Request:', $request->all());
         $request->validate([
-            'service_id' => 'required|exists:services,id',
-            'quantity' => 'integer|min:1'
+            'id' => 'required|exists:provider_services,id',
+            'pax' => 'required|integer',
+            'date' => 'nullable|date',
+            'return_date' => 'nullable|date',
+            'units' => 'nullable|integer',
+            'price' => 'nullable|numeric'
         ]);
 
         $cart = $this->getCart();
 
-        $item = $cart->items()->where('service_id', $request->service_id)->first();
+        // Check if exact same config exists (date, pax, etc), otherwise add new line
+        // Actually for travel, usually every addition is a distinct line item unless identical
+        // Let's assume distinct line items for simplicity or check all fields
 
-        if ($item) {
-            $item->increment('quantity', $request->quantity ?? 1);
-        } else {
-            $cart->items()->create([
-                'service_id' => $request->service_id,
-                'quantity' => $request->quantity ?? 1
-            ]);
-        }
+        $cart->items()->create([
+            'provider_service_id' => $request->id,
+            'quantity' => 1, // Usually 1 "booking" which contains X units
+            'pax' => $request->pax,
+            'date' => $request->date,
+            'return_date' => $request->return_date,
+            'units' => $request->units ?? 1,
+            'price' => $request->price
+        ]);
 
-        return redirect()->back()->with('success', 'Servicio agregado al carrito.');
+        return redirect('/')->with('success', 'Transfer added to cart.');
     }
 
     public function remove($cartItem)

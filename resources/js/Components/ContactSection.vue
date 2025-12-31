@@ -29,12 +29,12 @@ const submit = () => {
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
                 <h2 class="text-4xl font-serif font-bold text-white mb-4">Contact Us</h2>
-                <p class="text-lg text-primary-50 dark:text-slate-300 max-w-2xl mx-auto">
+                <p class="text-lg text-gray-900 max-w-2xl mx-auto">
                     Have a question or need a custom quote? Send us a message and our team will assist you.
                 </p>
             </div>
 
-            <div class="max-w-xl mx-auto bg-white dark:bg-secondary-900 rounded-2xl shadow-xl p-8 transform transition-all hover:scale-[1.01]">
+            <div class="max-w-xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 transform transition-all duration-300 hover:scale-[1.01]">
                 <div v-if="successMessage" class="mb-6 p-4 bg-green-100 text-green-700 rounded-lg border border-green-200">
                     {{ successMessage }}
                 </div>
@@ -47,7 +47,7 @@ const submit = () => {
                             v-model="form.name"
                             type="text"
                             required
-                            class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-colors outline-none"
+                            class="w-full rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-colors duration-300 px-4 py-3 outline-none"
                             placeholder="John Doe"
                         />
                         <div v-if="form.errors.name" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.errors.name }}</div>
@@ -60,7 +60,7 @@ const submit = () => {
                             v-model="form.email"
                             type="email"
                             required
-                            class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-colors outline-none"
+                            class="w-full rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-colors duration-300 px-4 py-3 outline-none"
                             placeholder="john@example.com"
                         />
                         <div v-if="form.errors.email" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.errors.email }}</div>
@@ -73,7 +73,7 @@ const submit = () => {
                             v-model="form.message"
                             rows="4"
                             required
-                            class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-colors outline-none resize-none"
+                            class="w-full rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-colors duration-300 px-4 py-3 outline-none resize-none"
                             placeholder="How can we help you?"
                         ></textarea>
                         <div v-if="form.errors.message" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.errors.message }}</div>
@@ -82,7 +82,7 @@ const submit = () => {
                     <button
                         type="submit"
                         :disabled="form.processing"
-                        class="w-full py-4 px-6 rounded-lg bg-cyan-600 hover:bg-cyan-700 text-white font-bold text-lg shadow-lg hover:shadow-xl transform transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="w-full py-4 px-6 rounded-full bg-cyan-600 hover:bg-cyan-700 dark:bg-cyan-500 dark:hover:bg-cyan-400 text-white font-bold text-lg shadow-lg hover:shadow-xl transform transition-all duration-300 hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-cyan-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <span v-if="form.processing">Sending...</span>
                         <span v-else>Send Message</span>

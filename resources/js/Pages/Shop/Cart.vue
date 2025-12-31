@@ -47,12 +47,12 @@ const formatPrice = (price) => {
 };
 
 const total = computed(() => {
-    return props.cart?.items.reduce((sum, item) => sum + (item.service.price_mxn * item.quantity), 0) || 0;
+    return props.cart?.items.reduce((sum, item) => sum + ((item.provider_service?.service?.price_mxn || item.price) * item.quantity), 0) || 0;
 });
 
 const proceedToCheckout = () => {
     // Check if any item requires scheduling
-    const needsScheduling = props.cart?.items.some(item => item.service.requires_scheduling);
+    const needsScheduling = props.cart?.items.some(item => item.provider_service?.service?.requires_scheduling);
 
     if (needsScheduling) {
         router.visit(route('scheduling.index'));
@@ -65,28 +65,48 @@ const proceedToCheckout = () => {
 <template>
     <Head title="Carrito de Compras" />
     <MainLayout>
-        <div class="py-12 bg-gray-50 dark:bg-secondary-900 min-h-screen">
+        <div class="py-12 bg-gray-50 dark:bg-gray-900 min-h-screen">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <h1 class="text-3xl font-bold text-secondary-900 dark:text-white mb-8">Carrito de Compras</h1>
 
                 <div v-if="cart && cart.items.length > 0" class="flex flex-col lg:flex-row gap-8">
                     <!-- Cart Items -->
-                    <div class="flex-1 bg-white dark:bg-secondary-800 rounded-xl shadow-lg overflow-hidden">
-                        <ul class="divide-y divide-gray-200 dark:divide-secondary-700">
-                            <li v-for="item in cart.items" :key="item.id" class="p-6 flex items-center">
-                                <img :src="item.service.image || '/images/placeholder.jpg'" alt="Service Image" class="h-24 w-24 object-cover rounded-lg border border-gray-200 dark:border-secondary-600" />
-                                <div class="ml-6 flex-1">
-                                    <h3 class="text-lg font-semibold text-secondary-900 dark:text-white">{{ item.service.title }}</h3>
-                                    <p class="text-secondary-500 dark:text-secondary-400 text-sm">{{ item.service.duration_minutes }} min</p>
-                                    <div class="mt-2 flex items-center justify-between">
+                    <div class="flex-1 bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+                        <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+                            <li v-for="item in cart.items" :key="item.id" class="p-6 flex flex-col sm:flex-row items-center">
+                                <img :src="item.provider_service?.service?.image || '/images/placeholder.jpg'" alt="Service Image" class="h-24 w-24 object-cover rounded-lg border border-gray-200 dark:border-secondary-600 mb-4 sm:mb-0" />
+                                <div class="ml-0 sm:ml-6 flex-1 w-full text-center sm:text-left">
+                                    <h3 class="text-lg font-semibold text-secondary-900 dark:text-white">{{ item.provider_service?.service?.title || item.provider_service?.name }}</h3>
+                                    
+                                    <div class="text-sm text-gray-500 dark:text-gray-400 mt-2 space-y-1 bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg inline-block text-left w-full">
+                                        <p v-if="item.provider_service?.zone">
+                                            <span class="font-bold text-cyan-600 dark:text-cyan-400">Zone:</span> 
+                                            {{ item.provider_service.zone.name }}
+                                        </p>
+                                        <p>
+                                            <span class="font-bold text-cyan-600 dark:text-cyan-400">Date:</span> 
+                                            {{ item.date }} 
+                                            <span v-if="item.return_date"> 
+                                                <span class="mx-1 text-gray-400">|</span> 
+                                                <span class="font-bold text-cyan-600 dark:text-cyan-400">Return:</span> 
+                                                {{ item.return_date }}
+                                            </span>
+                                        </p>
+                                        <p>
+                                            <span class="font-bold text-cyan-600 dark:text-cyan-400">Passengers:</span> 
+                                            {{ item.pax }}
+                                        </p>
+                                    </div>
+
+                                    <div class="mt-4 flex items-center justify-between">
                                         <div class="flex items-center border border-gray-300 dark:border-secondary-600 rounded-lg">
                                             <button @click="updateQuantity(item, item.quantity - 1)" class="px-3 py-1 text-secondary-600 dark:text-secondary-300 hover:bg-gray-100 dark:hover:bg-secondary-700">-</button>
                                             <span class="px-3 py-1 text-secondary-900 dark:text-white font-medium">{{ item.quantity }}</span>
                                             <button @click="updateQuantity(item, item.quantity + 1)" class="px-3 py-1 text-secondary-600 dark:text-secondary-300 hover:bg-gray-100 dark:hover:bg-secondary-700">+</button>
                                         </div>
                                         <div class="text-right">
-                                            <p class="text-lg font-bold text-primary-600">{{ formatPrice(item.service.price_mxn * item.quantity) }}</p>
-                                            <button @click="removeItem(item)" class="text-red-500 hover:text-red-700 text-sm mt-1">Eliminar</button>
+                                            <p class="text-lg font-bold text-primary-600">{{ formatPrice((item.provider_service?.service?.price_mxn || item.price) * item.quantity) }}</p>
+                                            <button @click="removeItem(item)" class="text-red-500 hover:text-red-700 text-sm mt-1 transition-colors hover:underline">Eliminar</button>
                                         </div>
                                     </div>
                                 </div>
@@ -96,7 +116,7 @@ const proceedToCheckout = () => {
 
                     <!-- Summary -->
                     <div class="w-full lg:w-96">
-                        <div class="bg-white dark:bg-secondary-800 rounded-xl shadow-lg p-6 sticky top-24">
+                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 sticky top-24">
                             <h2 class="text-xl font-bold text-secondary-900 dark:text-white mb-4">Resumen</h2>
                             <div class="flex justify-between mb-2 text-secondary-600 dark:text-secondary-300">
                                 <span>Subtotal</span>
@@ -110,14 +130,14 @@ const proceedToCheckout = () => {
                             <button @click="proceedToCheckout" class="w-full py-3 bg-primary-600 text-white rounded-lg font-bold hover:bg-primary-700 transition shadow-lg">
                                 Proceder con el registro
                             </button>
-                            <Link href="/services" class="block text-center mt-4 text-primary-600 hover:text-primary-700 font-medium">
+                            <Link href="/" class="block text-center mt-4 text-primary-600 hover:text-primary-700 font-medium hover:underline">
                                 Seguir comprando
                             </Link>
                         </div>
                     </div>
                 </div>
 
-                <div v-else class="text-center py-20 bg-white dark:bg-secondary-800 rounded-xl shadow-lg">
+                <div v-else class="text-center py-20 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 mx-auto text-secondary-300 mb-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>

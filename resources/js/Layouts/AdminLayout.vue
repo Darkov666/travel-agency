@@ -8,6 +8,7 @@ const showingSidebar = ref(false);
 const navigation = [
     { name: 'Dashboard', href: route('admin.dashboard'), routeName: 'admin.dashboard', icon: 'fas fa-home' },
     { name: 'Zones Editor', href: route('admin.zones.index'), routeName: 'admin.zones.*', icon: 'fas fa-map-marked-alt' },
+    { name: 'Providers', href: route('admin.providers.index'), routeName: 'admin.providers.*', icon: 'fas fa-building' },
     // Future: Users, Settings, Bookings
 ];
 

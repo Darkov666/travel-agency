@@ -20,7 +20,7 @@ class ZoneMatcher
         $zones = Zone::whereNotNull('coordinates')->get();
 
         foreach ($zones as $zone) {
-            $polygon = json_decode($zone->coordinates, true);
+            $polygon = $zone->coordinates;
             if ($polygon && $this->pointInPolygon($lat, $lng, $polygon)) {
                 return $zone;
             }

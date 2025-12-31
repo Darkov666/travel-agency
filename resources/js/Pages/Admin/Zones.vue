@@ -1,11 +1,13 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import { Head, useForm, router } from '@inertiajs/vue3';
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch, toRaw, markRaw } from 'vue';
 
 const props = defineProps({
     zones: Array
 });
+
+const apiKeyConfigured = ref(!!import.meta.env.VITE_GOOGLE_MAPS_API_KEY);
 
 const mapContainer = ref(null);
 let map = null;
@@ -19,6 +21,7 @@ const form = useForm({
     id: null,
     name: '',
     priority: 0,
+    transfer_time_minutes: 60,
     color: '#3b82f6',
     coordinates: null
 });
@@ -70,7 +73,7 @@ const initMap = () => {
         drawingManager.setDrawingMode(null);
         
         // Open modal to save new zone
-        editingZone.value = { isNew: true, polygon: polygon };
+        editingZone.value = { isNew: true, polygon: markRaw(polygon) };
         form.reset();
         form.coordinates = getPolygonCoords(polygon);
         showModal.value = true;
@@ -91,15 +94,15 @@ const loadZonesOnMap = () => {
     props.zones.forEach(zone => {
         if (!zone.coordinates) return;
         
-        const paths = JSON.parse(zone.coordinates);
+        // zone.coordinates is now an Array (Model Cast)
+        const paths = zone.coordinates;
         const polygon = new google.maps.Polygon({
             paths: paths,
             fillColor: zone.color,
             fillOpacity: 0.35,
             strokeColor: zone.color,
             strokeWeight: 2,
-            editable: false, // Default not editable until selected? Or maybe always editable? Let's make toggle?
-                             // For simplicity: Click to Edit.
+            editable: false, 
             map: map,
             zIndex: zone.priority
         });
@@ -116,16 +119,13 @@ const addPolygonListeners = (polygon) => {
     google.maps.event.addListener(polygon, 'click', () => {
         if (polygon.zoneData) {
             editZone(polygon.zoneData, polygon);
-        } else {
-            // It's a newly drawn one that hasn't been saved?
-            // Usually handled by 'polygoncomplete', but if canceled modal, we might have issue.
-            // For now, assume clicked = edit existing.
         }
     });
 
     // Update coordinates when edited
     const updateCoords = () => {
-        if (editingZone.value && editingZone.value.polygon === polygon) {
+        // Vue wraps objects in Proxies. We must compare the raw object.
+        if (editingZone.value && toRaw(editingZone.value.polygon) === polygon) {
             form.coordinates = getPolygonCoords(polygon);
         }
     };
@@ -136,22 +136,23 @@ const addPolygonListeners = (polygon) => {
 
 const getPolygonCoords = (polygon) => {
     const len = polygon.getPath().getLength();
-    const htmlCoords = [];
+    const coords = [];
     for (let i = 0; i < len; i++) {
-        htmlCoords.push({
+        coords.push({
             lat: polygon.getPath().getAt(i).lat(),
             lng: polygon.getPath().getAt(i).lng()
         });
     }
-    return JSON.stringify(htmlCoords);
+    return coords; // Return Array, not String
 };
 
 const editZone = (zone, polygon) => {
-    editingZone.value = { isNew: false, polygon: polygon };
+    editingZone.value = { isNew: false, polygon: markRaw(polygon) };
     
     form.id = zone.id;
     form.name = zone.name;
     form.priority = zone.priority;
+    form.transfer_time_minutes = zone.transfer_time_minutes || 60;
     form.color = zone.color;
     form.coordinates = zone.coordinates; // Keep existing unless edited
     
@@ -163,6 +164,8 @@ const editZone = (zone, polygon) => {
 };
 
 const saveZone = () => {
+    if (!form.transfer_time_minutes) form.transfer_time_minutes = 60;
+
     if (editingZone.value.isNew) {
         form.post(route('admin.zones.store'), {
             onSuccess: () => {
@@ -235,6 +238,10 @@ onMounted(() => {
         </template>
 
         <div class="h-[calc(100vh-180px)] w-full relative">
+            <div v-if="!apiKeyConfigured" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+                <p class="font-bold">Configuration Error</p>
+                <p>Google Maps API Key is missing. The map and editing tools will not work. Please add VITE_GOOGLE_MAPS_API_KEY to your .env file.</p>
+            </div>
             <div ref="mapContainer" class="w-full h-full"></div>
 
             <!-- Edit Modal -->
@@ -254,6 +261,13 @@ onMounted(() => {
                             Priority <span class="font-normal text-xs text-gray-500">(Higher wins)</span>
                         </label>
                         <input v-model="form.priority" type="number" class="w-full rounded border-gray-300 dark:bg-gray-700 dark:text-white">
+                    </div>
+
+                    <div class="mb-4">
+                         <label class="block text-sm font-bold mb-1 text-gray-700 dark:text-gray-300">
+                            Transfer Time to Airport (min)
+                        </label>
+                        <input v-model="form.transfer_time_minutes" type="number" min="0" class="w-full rounded border-gray-300 dark:bg-gray-700 dark:text-white" required>
                     </div>
 
                     <div class="mb-4">

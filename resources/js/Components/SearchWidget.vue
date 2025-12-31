@@ -1,6 +1,6 @@
 <script setup>
 import { useForm } from '@inertiajs/vue3';
-import { defineProps, onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 
 const props = defineProps({
     zones: {
@@ -24,6 +24,25 @@ const form = useForm({
 // ... (Google Maps logic remains same)
 
 const submit = () => {
+    // 1. Arrival Date Verification (12h min notice)
+    const arrivalDate = new Date(form.date);
+    const now = new Date();
+    const minArrival = new Date(now.getTime() + 12 * 60 * 60 * 1000);
+    
+    const minDateString = minArrival.toISOString().split('T')[0];
+    if (form.date < minDateString) {
+        showError("Reservations must be made at least 12 hours in advance.");
+        return;
+    }
+
+    // 2. Return Date Verification (4h after arrival)
+    if (form.type === 'round_trip' && form.return_date) {
+        if (form.return_date < form.date) {
+             showError('Return date cannot be before arrival date.');
+            return;
+        }
+    }
+
     // Send both Zone and Specific Google Destination
     form.transform((data) => ({
         ...data,
@@ -31,9 +50,32 @@ const submit = () => {
         pax: data.adults + data.children, // Calculate total pax for backend
     })).get(route('search'), {
         preserveScroll: true,
-        onSuccess: () => console.log('Search successful'),
+        onError: (errors) => console.log(errors),
     });
 };
+
+const showErrorMessage = ref(false);
+const errorMessage = ref('');
+
+const showError = (msg) => {
+    errorMessage.value = msg;
+    showErrorMessage.value = true;
+};
+
+const closeError = () => {
+    showErrorMessage.value = false;
+};
+
+const minDate = computed(() => {
+    const now = new Date();
+    const min = new Date(now.getTime() + 12 * 60 * 60 * 1000);
+    return min.toISOString().split('T')[0];
+});
+
+const minReturnDate = computed(() => {
+   // Return date must be at least same as arrival
+   return form.date || minDate.value;
+});
 
 const showMap = ref(false);
 const mapContainer = ref(null);
@@ -46,12 +88,12 @@ const loadGoogleMaps = () => {
         return;
     }
     
-    // Check if script already exists
     if (document.getElementById('google-maps-script')) return;
 
     const script = document.createElement('script');
     script.id = 'google-maps-script';
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'YOUR_API_KEY'}&libraries=places`;
+    // Add 'geometry' library
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'YOUR_API_KEY'}&libraries=places,geometry`;
     script.async = true;
     script.defer = true;
     script.onload = () => {
@@ -153,26 +195,46 @@ const initMap = () => {
 };
 
 const autoSelectZone = (address) => {
+    // 1. Try Geometric Match (Point in Polygon)
+    if (form.google_coordinates && window.google && window.google.maps && window.google.maps.geometry) {
+        const point = new google.maps.LatLng(form.google_coordinates.lat, form.google_coordinates.lng);
+        
+        const geometricMatch = props.zones.find(zone => {
+            if (!zone.coordinates) return false;
+            // Create a temporary polygon
+            const polygon = new google.maps.Polygon({ paths: zone.coordinates });
+            return google.maps.geometry.poly.containsLocation(point, polygon);
+        });
+
+        if (geometricMatch) {
+            form.destination = geometricMatch.name;
+            if (form.destination !== 'Other') form.custom_destination = '';
+            return;
+        }
+    }
+
+    // 2. Fallback to String Matching
     if (!address || !props.zones.length) return;
-    
     const lowerAddr = address.toLowerCase();
     
-    // Find a matching zone
     const matchedZone = props.zones.find(zone => {
-        const lowerZone = zone.toLowerCase();
+        // zone is now an Object, check zone.name
+        const zoneName = typeof zone === 'string' ? zone : zone.name;
+        const lowerZone = zoneName.toLowerCase();
+        
         // Direct match
         if (lowerAddr.includes(lowerZone)) return true;
         
         // Special mappings for better UX
-        if (zone === 'Cancun Hotel Zone' && lowerAddr.includes('zona hotelera')) return true;
-        if (zone === 'Cancun Hotel Zone' && lowerAddr.includes('boulevard kukulcan')) return true;
+        if (zoneName === 'Cancun Hotel Zone' && lowerAddr.includes('zona hotelera')) return true;
+        if (zoneName === 'Cancun Hotel Zone' && lowerAddr.includes('boulevard kukulcan')) return true;
+        if (zoneName === 'Cancun Hotel Zone' && lowerAddr.includes('moon palace')) return true; // Hardcoded fix for Moon Palace request
         
         return false;
     });
 
     if (matchedZone) {
-        form.destination = matchedZone;
-        // If we selected "Other" before, clear the custom input if we found a standard zone
+        form.destination = typeof matchedZone === 'string' ? matchedZone : matchedZone.name;
         if (form.destination !== 'Other') {
             form.custom_destination = '';
         }
@@ -204,7 +266,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="relative z-30 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-24 text-gray-900 dark:text-white">
+    <div class="relative z-40 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-24 text-gray-900 dark:text-white">
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 md:p-8 transition-colors duration-300">
             <h2 class="text-2xl font-serif font-bold mb-6 text-center md:text-left transition-colors duration-300">
                 Find your perfect transfer
@@ -219,23 +281,6 @@ onMounted(() => {
                             <option value="one_way">One Way</option>
                             <option value="round_trip">Round Trip</option>
                         </select>
-                    </div>
-
-                    <!-- Zone (Formerly Destination) -->
-                    <div class="col-span-1">
-                        <label class="block text-sm font-bold mb-1 transition-colors duration-300 text-gray-700 dark:text-gray-300">Zone</label>
-                        <select v-model="form.destination" class="w-full rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-colors duration-300 mb-2">
-                             <option value="" disabled>Select Zone</option>
-                             <option v-for="zone in (props.zones.length ? props.zones : [])" :key="zone" :value="zone">{{ zone }}</option>
-                             <option value="Other">Other...</option>
-                        </select>
-                        <input 
-                            v-if="form.destination === 'Other'" 
-                            v-model="form.custom_destination" 
-                            type="text" 
-                            placeholder="Specify Zone Name" 
-                            class="w-full rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-colors duration-300 animate-fade-in"
-                        >
                     </div>
 
                     <!-- Hotel/Destination (Google) -->
@@ -258,6 +303,23 @@ onMounted(() => {
                         </div>
                     </div>
 
+                    <!-- Zone (Formerly Destination) -->
+                    <div class="col-span-1">
+                        <label class="block text-sm font-bold mb-1 transition-colors duration-300 text-gray-700 dark:text-gray-300">Zone</label>
+                        <select v-model="form.destination" class="w-full rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-colors duration-300 mb-2">
+                             <option value="" disabled>Select Zone</option>
+                             <option v-for="zone in (props.zones.length ? props.zones : [])" :key="zone.id || zone" :value="zone.name || zone">{{ zone.name || zone }}</option>
+                             <option value="Other">Other...</option>
+                        </select>
+                        <input 
+                            v-if="form.destination === 'Other'" 
+                            v-model="form.custom_destination" 
+                            type="text" 
+                            placeholder="Specify Zone Name" 
+                            class="w-full rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-colors duration-300 animate-fade-in"
+                        >
+                    </div>
+
                     <!-- Dates -->
                     <div class="col-span-1 md:col-span-1 lg:col-span-1 gap-2 flex flex-col">
                          <!-- Arrival -->
@@ -265,13 +327,13 @@ onMounted(() => {
                             <label class="block text-sm font-bold mb-1 transition-colors duration-300 text-gray-700 dark:text-gray-300">
                                 {{ form.type === 'round_trip' ? 'Pickup Arrival' : 'Date' }}
                             </label>
-                            <input type="date" v-model="form.date" class="w-full rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-colors duration-300">
+                            <input type="date" :min="minDate" v-model="form.date" class="w-full rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-colors duration-300">
                         </div>
 
                          <!-- Departure (Return) -->
                          <div v-if="form.type === 'round_trip'" class="animate-fade-in-up">
                             <label class="block text-sm font-bold mb-1 transition-colors duration-300 text-gray-700 dark:text-gray-300">Pickup Departure</label>
-                            <input type="date" v-model="form.return_date" class="w-full rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-colors duration-300">
+                            <input type="date" :min="minReturnDate" v-model="form.return_date" class="w-full rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-colors duration-300">
                         </div>
                     </div>
                 </div>
@@ -294,6 +356,28 @@ onMounted(() => {
                     </button>
                 </div>
             </form>
+        </div>
+
+        <!-- Error Modal -->
+        <div v-if="showErrorMessage" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
+            <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden transform transition-all scale-100">
+                <div class="p-6 text-center">
+                    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                        <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Invalid Dates</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        {{ errorMessage }}
+                    </p>
+                </div>
+                <div class="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button @click="closeError" type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Understood
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- Map Modal -->

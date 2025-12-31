@@ -14,7 +14,7 @@ Route::get('/', function () {
     return Inertia::render('Welcome', [
         'featuredServices' => Service::where('is_active', true)->take(3)->get(),
         'latestPosts' => BlogPost::where('is_published', true)->latest('published_at')->take(3)->get(),
-        'zones' => \App\Models\Zone::pluck('name'),
+        'zones' => \App\Models\Zone::all(['name', 'coordinates']), // Pass coordinates for geofencing
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
@@ -110,6 +110,19 @@ Route::prefix('admin')->group(function () {
         // Profile
         Route::get('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('admin.profile.edit');
         Route::post('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('admin.profile.update');
+
+        // Providers Management
+        Route::resource('/providers', \App\Http\Controllers\Admin\ProviderController::class)->names('admin.providers');
+
+        // Vehicles (Fleet)
+        Route::post('/vehicles', [\App\Http\Controllers\Admin\VehicleController::class, 'store'])->name('admin.vehicles.store');
+        Route::put('/vehicles/{vehicle}', [\App\Http\Controllers\Admin\VehicleController::class, 'update'])->name('admin.vehicles.update');
+        Route::delete('/vehicles/{vehicle}', [\App\Http\Controllers\Admin\VehicleController::class, 'destroy'])->name('admin.vehicles.destroy');
+
+        // Provider Services (Price Lists)
+        Route::post('/provider-services', [\App\Http\Controllers\Admin\ProviderServiceController::class, 'store'])->name('admin.provider-services.store');
+        Route::put('/provider-services/{providerService}', [\App\Http\Controllers\Admin\ProviderServiceController::class, 'update'])->name('admin.provider-services.update');
+        Route::delete('/provider-services/{providerService}', [\App\Http\Controllers\Admin\ProviderServiceController::class, 'destroy'])->name('admin.provider-services.destroy');
     });
 });
 
@@ -123,7 +136,14 @@ Route::get('/scheduling', [App\Http\Controllers\SchedulingController::class, 'in
 Route::post('/scheduling', [App\Http\Controllers\SchedulingController::class, 'store'])->name('scheduling.store');
 
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
-Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+Route::get('/checkout/details', [CheckoutController::class, 'details'])->name('checkout.details');
+Route::post('/checkout/details', [CheckoutController::class, 'storeDetails'])->name('checkout.store_details');
+Route::get('/checkout/{reservation}/payment', [CheckoutController::class, 'payment'])->name('checkout.payment');
+Route::post('/checkout/{reservation}/pay', [CheckoutController::class, 'processPayment'])->name('checkout.process_payment');
+Route::get('/checkout/pending/{reservation}', [CheckoutController::class, 'pending'])->name('checkout.pending');
+// Admin Confirmation Route (Protected in real app, using GET for email link simplicity)
+Route::get('/admin/reservations/{reservation}/confirm', [CheckoutController::class, 'confirmPayment'])->name('admin.reservations.confirm');
+
 
 Route::get('/debug-data', function () {
     return ['services' => \App\Models\Service::all()];
