@@ -16,10 +16,19 @@ class ReservationController extends Controller
 {
     public function index()
     {
+        $user = \Illuminate\Support\Facades\Auth::user();
+
         // Simple list for now to manage items
-        $items = ReservationItem::with(['reservation', 'providerService.provider', 'assignedProvider'])
-            ->latest()
-            ->paginate(20);
+        $query = ReservationItem::with(['reservation', 'providerService.provider', 'assignedProvider']);
+
+        // Scope by organization if not root
+        if ($user->role !== 'root' && $user->organization_id) {
+            $query->whereHas('reservation', function ($q) use ($user) {
+                $q->where('organization_id', $user->organization_id);
+            });
+        }
+
+        $items = $query->latest()->paginate(20);
 
         return Inertia::render('Admin/Reservations/Index', [
             'items' => $items

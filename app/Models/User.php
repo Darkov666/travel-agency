@@ -10,6 +10,7 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
@@ -21,8 +22,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'organization_id',
         'role',
         'phone',
+        'operator_status',
         'gender',
         'profile_photo_path',
         'two_factor_code',
@@ -83,5 +86,31 @@ class User extends Authenticatable
     public function appointments()
     {
         return $this->hasMany(Appointment::class);
+    }
+
+    public function isRoot()
+    {
+        return $this->role === 'root';
+    }
+
+    public function isAdminTi()
+    {
+        return $this->role === 'admin_ti';
+    }
+
+    public function isPlatformAdmin()
+    {
+        return in_array($this->role, ['root', 'admin_ti']);
+    }
+
+    public function isOrgAdmin()
+    {
+        // Organization Admin is usually 'admin' role within an org
+        return $this->role === 'admin';
+    }
+
+    public function isProvider()
+    {
+        return str_contains($this->role, 'provider') || $this->provider_id !== null;
     }
 }

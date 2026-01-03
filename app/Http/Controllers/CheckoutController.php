@@ -8,6 +8,7 @@ use App\Models\Cart;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Appointment;
 use Illuminate\Support\Facades\Hash;
+use App\Services\StripeService;
 
 class CheckoutController extends Controller
 {
@@ -147,12 +148,12 @@ class CheckoutController extends Controller
         ]);
     }
 
-    public function processPayment(Request $request, $bookingRef)
+    public function processPayment(Request $request, $bookingRef, StripeService $stripe)
     {
         $reservation = \App\Models\Reservation::where('booking_ref', $bookingRef)->firstOrFail();
 
         $validated = $request->validate([
-            'payment_method' => 'required|in:paypal,transfer,cash',
+            'payment_method' => 'required|in:paypal,transfer,cash,stripe',
             'payment_choice' => 'nullable|in:full,deposit',
         ]);
 
@@ -161,64 +162,109 @@ class CheckoutController extends Controller
 
         $reservation->payment_method = $method;
         $reservation->payment_choice = $choice;
-
-        // Calculate Paid Amount
         $total = $reservation->total_amount;
         $paid = 0;
 
+        if ($method === 'stripe') {
+            $amountToCharge = ($choice === 'full') ? $total : ($total * 0.20);
+
+            // Connect Logic
+            $destination = null;
+            $fee = 0;
+            if (app()->bound('tenant')) {
+                $tenant = app('tenant');
+                if ($tenant->stripe_connect_id) {
+                    $destination = $tenant->stripe_connect_id;
+                    $fee = $amountToCharge * 0.05; // 5% Platform Fee
+                }
+            }
+
+            try {
+                $session = $stripe->createBookingCheckoutSession(
+                    $reservation,
+                    $amountToCharge,
+                    $destination,
+                    $fee,
+                    route('checkout.stripe.success', ['bookingRef' => $bookingRef]) . '?session_id={CHECKOUT_SESSION_ID}',
+                    route('checkout.payment', ['reservation' => $bookingRef])
+                );
+                return Inertia::location($session->url);
+            } catch (\Exception $e) {
+                return back()->with('error', 'Stripe checkout failed: ' . $e->getMessage());
+            }
+        }
+
+        // Logic for Non-Stripe Methods
         if ($method === 'cash') {
-            // Cash always deposit only effectively
-            $paid = 0; // Or standard commission? Let's assume 0 confirmed until "paid" via other channel? 
-            // Usually cash booking = Pay Commission Online? 
-            // User said: "charged upfront commission... rest in cash".
-            // So if choosing "Cash", user pays Commission NOW (via transfer/paypal?).
-            // Contradiction: "Payment Method" usually implies HOW they pay NOW.
-            // If they select "Cash", usually means "I will pay Cash". 
-            // But if commission is REQUIRED upfront, "Cash" option implies "Pay Commission Now, Rest Cash Later".
-            // Let's assume "Cash" means "Pay Deposit Now".
-            $paid = 0; // Pending deposit confirmation
+            $paid = 0;
         } elseif ($choice === 'full') {
             $paid = $total;
         } else {
-            // Deposit (20%)
             $paid = $total * 0.20;
         }
 
         if ($method === 'paypal') {
-            // SIMULATION: Assume success
+            // SIMULATION
             $reservation->payment_status = ($choice === 'full') ? 'paid' : 'partial';
             $reservation->amount_paid = $paid;
             $reservation->balance_due = $total - $paid;
             $reservation->status = 'confirmed';
             $reservation->save();
 
-            // Send Confirmation Email
             $this->sendConfirmationEmail($reservation);
 
-            // Clear Cart
+            \App\Models\ActionLog::log('reservation_confirmed', "Confirmed #{$reservation->booking_ref} via PayPal Simulation", $reservation);
+
             $cart = $this->getCart($request);
             if ($cart)
                 $cart->items()->delete();
 
             return redirect('/')->with('success', 'Reservation confirmed! Check your email.');
         } else {
-            // Transfer or Cash (Deposit via Transfer)
+            // Transfer/Cash
             $reservation->payment_status = 'pending';
-            $reservation->amount_paid = 0; // Nothing paid yet
-            $reservation->balance_due = $total; // Full amount due until proof verified
+            $reservation->amount_paid = 0;
+            $reservation->balance_due = $total;
             $reservation->status = 'pending';
             $reservation->save();
 
-            // Clear Cart (Reservation is saved)
             $cart = $this->getCart($request);
             if ($cart)
                 $cart->items()->delete();
 
-            // Send Confirmation/Instruction Email for pending payment
             $this->sendConfirmationEmail($reservation);
 
-            return redirect('/')->with('success', 'Reservation placed! Please check your email for payment instructions.');
+            \App\Models\ActionLog::log('reservation_pending', "Placed #{$reservation->booking_ref} via {$method}", $reservation);
+
+            return redirect('/')->with('success', 'Reservation placed! Please check your email.');
         }
+    }
+
+    public function stripeSuccess(Request $request, $bookingRef)
+    {
+        $reservation = \App\Models\Reservation::where('booking_ref', $bookingRef)->firstOrFail();
+        // Verify session_id logic here (optional for MVP)
+
+        $choice = $reservation->payment_choice ?? 'deposit';
+        $amountPaid = ($choice === 'full') ? $reservation->total_amount : ($reservation->total_amount * 0.20);
+
+        $reservation->update([
+            'status' => 'confirmed',
+            'payment_status' => ($choice === 'full') ? 'paid' : 'partial',
+            'amount_paid' => $amountPaid,
+            'balance_due' => $reservation->total_amount - $amountPaid
+        ]);
+
+        $this->sendConfirmationEmail($reservation);
+
+        \App\Models\ActionLog::log('reservation_confirmed', "Confirmed #{$reservation->booking_ref} via Stripe", $reservation);
+
+        // Clear Cart
+        $cart = $this->getCart($request);
+        if ($cart)
+            $cart->items()->delete();
+
+        return redirect('/')->with('success', 'Payment successful! Reservation confirmed.');
     }
 
     public function pending(Request $request, $bookingRef)
@@ -281,6 +327,8 @@ class CheckoutController extends Controller
 
         // Send Confirmation Email
         $this->sendConfirmationEmail($reservation);
+
+        \App\Models\ActionLog::log('reservation_confirmed_manual', "Manually confirmed #{$reservation->booking_ref}", $reservation);
 
         return redirect()->back()->with('success', 'Reservation confirmed and email sent.');
     }

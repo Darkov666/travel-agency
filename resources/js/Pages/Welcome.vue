@@ -10,6 +10,7 @@ import ContactSection from '@/Components/ContactSection.vue';
 defineProps({
     featuredServices: Array,
     latestPosts: Array,
+    latestReviews: Array,
     zones: Array,
 });
 
@@ -34,7 +35,7 @@ const ruinsImage = 'https://placehold.co/800x600/FF7F50/FFFFFF/png?text=Mayan+Ru
             </div>
 
             <!-- Content -->
-            <div class="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-center items-center text-center pt-20 pb-24">
+            <div class="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-center items-center text-center pt-20 pb-48">
                 <h1 class="text-5xl md:text-7xl font-serif font-bold text-white drop-shadow-xl tracking-tight mb-4 animate-fade-in-up">
                     Experience <span class="text-secondary-300">Paradise</span> <br class="hidden md:block" /> with Comfort
                 </h1>
@@ -57,7 +58,7 @@ const ruinsImage = 'https://placehold.co/800x600/FF7F50/FFFFFF/png?text=Mayan+Ru
         <div class="py-16 bg-primary-50 dark:bg-gray-900 transition-colors duration-300">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-                    <div class="p-6 rounded-xl bg-white dark:bg-gray-800 hover:shadow-lg transition">
+                    <div class="p-6 rounded-xl bg-gray-100 dark:bg-gray-800 hover:shadow-lg transition">
                         <div class="w-16 h-16 mx-auto bg-cyan-100 dark:bg-cyan-900 rounded-full flex items-center justify-center mb-4 text-cyan-600 dark:text-cyan-400">
                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -66,7 +67,7 @@ const ruinsImage = 'https://placehold.co/800x600/FF7F50/FFFFFF/png?text=Mayan+Ru
                         <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Punctuality Guaranteed</h3>
                         <p class="text-gray-600 dark:text-gray-300">We track your flight to ensure we are there when you land. No waiting.</p>
                     </div>
-                     <div class="p-6 rounded-xl bg-white dark:bg-gray-800 hover:shadow-lg transition">
+                     <div class="p-6 rounded-xl bg-gray-100 dark:bg-gray-800 hover:shadow-lg transition">
                         <div class="w-16 h-16 mx-auto bg-cyan-100 dark:bg-cyan-900 rounded-full flex items-center justify-center mb-4 text-cyan-600 dark:text-cyan-400">
                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -75,7 +76,7 @@ const ruinsImage = 'https://placehold.co/800x600/FF7F50/FFFFFF/png?text=Mayan+Ru
                         <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Safe & Secure</h3>
                         <p class="text-gray-600 dark:text-gray-300">Certified drivers and sanitized luxury vehicles for your peace of mind.</p>
                     </div>
-                     <div class="p-6 rounded-xl bg-white dark:bg-gray-800 hover:shadow-lg transition">
+                     <div class="p-6 rounded-xl bg-gray-100 dark:bg-gray-800 hover:shadow-lg transition">
                         <div class="w-16 h-16 mx-auto bg-cyan-100 dark:bg-cyan-900 rounded-full flex items-center justify-center mb-4 text-cyan-600 dark:text-cyan-400">
                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -115,12 +116,14 @@ const ruinsImage = 'https://placehold.co/800x600/FF7F50/FFFFFF/png?text=Mayan+Ru
          <!-- Vehicle Fleet Section -->
         <div class="py-20 bg-primary-50 dark:bg-gray-900 transition-colors duration-300">
              <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="lg:grid lg:grid-cols-2 lg:gap-16 items-center flex-row-reverse">
-                    <div class="order-2 lg:order-1 mt-10 lg:mt-0">
+                <div class="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
+                    <!-- Image (First on Mobile due to DOM order, Left on Desktop due to order class) -->
+                    <div class="order-2 lg:order-1 mb-12 lg:mb-0">
                          <div class="relative rounded-2xl overflow-hidden shadow-2xl transform hover:scale-[1.02] transition duration-500">
                             <img :src="vanImage" alt="Luxury Van" class="w-full h-auto object-cover">
                         </div>
                     </div>
+                    <!-- Text (Second on Mobile, Right on Desktop) -->
                     <div class="order-1 lg:order-2">
                         <h2 class="text-4xl font-serif font-bold text-gray-900 dark:text-white mb-6">Travel in Luxury</h2>
                         <p class="text-lg text-gray-600 dark:text-gray-300 mb-8">
@@ -141,6 +144,109 @@ const ruinsImage = 'https://placehold.co/800x600/FF7F50/FFFFFF/png?text=Mayan+Ru
                             </li>
                         </ul>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Blog Section -->
+        <div v-if="latestPosts && latestPosts.length > 0" class="py-20 bg-white dark:bg-gray-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                     <h2 class="text-3xl md:text-4xl font-serif font-bold text-gray-900 dark:text-white mb-4">Latest from our Blog</h2>
+                     <p class="text-lg text-gray-600 dark:text-gray-300">Travel tips, guides, and updates from the Riviera Maya.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <Link v-for="post in latestPosts" :key="post.id" :href="route('blog.show', post.slug)" class="group block">
+                        <div class="relative overflow-hidden rounded-lg shadow-lg aspect-video mb-4">
+                            <img :src="post.image || 'https://placehold.co/600x400/2AC1D8/FFFFFF/png?text=Travel+Blog'" :alt="post.title" class="w-full h-full object-cover transform group-hover:scale-105 transition duration-500">
+                             <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition"></div>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-primary-600 transition">{{ post.title }}</h3>
+                        <p class="text-gray-600 dark:text-gray-400 line-clamp-2">{{ post.excerpt }}</p>
+                    </Link>
+                </div>
+                 <div class="mt-8 text-center">
+                    <Link href="/blog" class="inline-flex items-center text-primary-600 hover:text-primary-700 font-semibold">
+                        Read more articles <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                    </Link>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reviews & TripAdvisor Section -->
+        <div class="py-20 bg-gray-50 dark:bg-gray-900">
+             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                     
+                     <!-- TripAdvisor Mock Widget -->
+                     <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl flex flex-col items-center justify-center text-center border-t-4 border-[#00B67A]">
+                         <img src="https://static.tacdn.com/img2/brand_refresh/Tripadvisor_lockup_horizontal_secondary_registered.svg" alt="TripAdvisor" class="h-12 mb-6 dark:invert">
+                         <div class="text-5xl font-bold text-gray-900 dark:text-white mb-2">5.0</div>
+                         <div class="flex text-[#00B67A] mb-4 space-x-1">
+                             <svg v-for="i in 5" :key="i" class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                         </div>
+                         <p class="text-gray-500 dark:text-gray-400 mb-6">Based on <span class="font-bold text-gray-900 dark:text-white">1,250+ reviews</span></p>
+                         <p class="text-sm text-gray-400">"Excellent service, on time and very professional drivers."</p>
+                          <div class="mt-6 px-4 py-2 bg-[#00B67A] text-white rounded-md font-bold text-sm">Certificate of Excellence</div>
+                     </div>
+
+                     <!-- Customer Reviews List -->
+                     <div class="lg:col-span-2">
+                         <div class="flex justify-between items-end mb-8">
+                             <div>
+                                 <h2 class="text-3xl font-serif font-bold text-gray-900 dark:text-white">What our clients say</h2>
+                                 <p class="text-gray-600 dark:text-gray-300 mt-2">Real feedback from verified travelers.</p>
+                             </div>
+                         </div>
+
+                         <div class="grid gap-6">
+                             <div v-for="review in latestReviews" :key="review.id" class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md flex gap-4">
+                                 <div class="flex-shrink-0">
+                                     <div class="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-xl">
+                                         {{ review.reviewer_name.charAt(0) }}
+                                     </div>
+                                 </div>
+                                 <div>
+                                     <div class="flex items-center mb-2">
+                                         <span class="font-bold text-gray-900 dark:text-white mr-2">{{ review.reviewer_name }}</span>
+                                         <div class="flex text-yellow-400 text-sm">
+                                              <span v-for="n in 5" :key="n">
+                                                  <span v-if="n <= review.rating">★</span>
+                                                  <span v-else class="text-gray-300">★</span>
+                                              </span>
+                                         </div>
+                                     </div>
+                                     <p class="text-gray-600 dark:text-gray-300 italic">"{{ review.content }}"</p>
+                                      <p class="text-xs text-gray-400 mt-2">{{ new Date(review.created_at).toLocaleDateString() }}</p>
+                                 </div>
+                             </div>
+                             
+                             <!-- Empty State -->
+                             <div v-if="!latestReviews || latestReviews.length === 0" class="text-center py-10 bg-white dark:bg-gray-800 rounded-xl border border-dashed border-gray-300">
+                                 <p class="text-gray-500">No reviews yet. Be the first to review us!</p>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+        </div>
+
+        <!-- Partner CTA Section -->
+        <div class="py-20 bg-gradient-to-r from-blue-900 to-indigo-900 text-white relative overflow-hidden">
+            <div class="absolute inset-0 bg-pattern opacity-10"></div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+                <h2 class="text-3xl md:text-4xl font-serif font-bold mb-6">Own a Travel Agency?</h2>
+                <p class="text-xl text-blue-100 max-w-2xl mx-auto mb-10">
+                    Launch your own digital booking platform with our white-label solution. 
+                    Manage fleets, tours, and payments effortlessly.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <Link href="/partner/register" class="px-8 py-3 bg-white text-blue-900 font-bold rounded-full hover:bg-gray-100 transition shadow-lg">
+                        Become a Partner
+                    </Link>
+                    <a href="#contact" class="px-8 py-3 border border-white text-white font-bold rounded-full hover:bg-white/10 transition">
+                        Contact Sales
+                    </a>
                 </div>
             </div>
         </div>

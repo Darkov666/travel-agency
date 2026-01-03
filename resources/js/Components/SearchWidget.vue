@@ -266,9 +266,9 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="relative z-40 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-24 text-gray-900 dark:text-white">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 md:p-8 transition-colors duration-300">
-            <h2 class="text-2xl font-serif font-bold mb-6 text-center md:text-left transition-colors duration-300">
+    <div class="relative z-40 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-24 mb-16 md:mb-24 text-gray-900 dark:text-white">
+        <div class="bg-gray-100 dark:bg-gray-800 rounded-2xl shadow-xl p-6 md:p-8 transition-colors duration-300 border border-transparent dark:border-gray-700">
+            <h2 class="text-2xl font-serif font-bold mb-6 text-center md:text-left transition-colors duration-300 text-gray-900 dark:text-white">
                 Find your perfect transfer
             </h2>
             

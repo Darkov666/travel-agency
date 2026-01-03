@@ -25,11 +25,11 @@ const submit = () => {
 </script>
 
 <template>
-    <section class="py-20 bg-primary-600 dark:bg-secondary-950 transition-colors duration-300" id="contact">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section class="py-20 bg-white transition-colors duration-300" id="contact">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="text-center mb-16">
-                <h2 class="text-4xl font-serif font-bold text-white mb-4">Contact Us</h2>
-                <p class="text-lg text-gray-900 max-w-2xl mx-auto">
+                <h2 class="text-4xl font-serif font-bold text-black mb-4">Contact Us</h2>
+                <p class="text-lg text-black max-w-2xl mx-auto">
                     Have a question or need a custom quote? Send us a message and our team will assist you.
                 </p>
             </div>

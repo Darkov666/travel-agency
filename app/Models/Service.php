@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class Service extends Model
 {
     protected $fillable = [
+        'organization_id',
         'title',
+        'slug',
         'description',
         'price',
         'price_mxn',
@@ -16,12 +18,14 @@ class Service extends Model
         'type',
         'is_active',
         'image',
+        'features',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'price' => 'decimal:2',
         'price_mxn' => 'decimal:2',
+        'features' => 'array',
     ];
 
     protected $appends = ['requires_scheduling', 'downloadable'];

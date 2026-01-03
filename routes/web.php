@@ -21,6 +21,7 @@ Route::get('/', function () {
     return Inertia::render('Welcome', [
         'featuredServices' => Service::where('is_active', true)->take(3)->get(),
         'latestPosts' => BlogPost::where('is_published', true)->latest('published_at')->take(3)->get(),
+        'latestReviews' => \App\Models\Review::where('is_approved', true)->latest()->take(5)->get(),
         'zones' => \App\Models\Zone::all(['name', 'coordinates']), // Pass coordinates for geofencing
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
@@ -42,17 +43,11 @@ Route::get('/register', function () {
     return Inertia::render('Auth/Register');
 })->name('register');
 
-Route::get('/shop', function () {
-    return Inertia::render('Shop');
-});
+Route::get('/shop', [\App\Http\Controllers\ShopController::class, 'index'])->name('shop.index');
+Route::get('/shop/{id}', [\App\Http\Controllers\ShopController::class, 'show'])->name('shop.show');
 
-Route::get('/services', function () {
-    return Inertia::render('Services', [
-        'services' => Service::where('is_active', true)
-            ->whereIn('type', ['transfer', 'tour', 'private'])
-            ->get()
-    ]);
-});
+Route::get('/services', [\App\Http\Controllers\ServiceController::class, 'index'])->name('services.index');
+Route::get('/services/{service}', [\App\Http\Controllers\ServiceController::class, 'show'])->name('services.show');
 
 Route::get('/special-services', function () {
     return Inertia::render('SpecialServices', [
@@ -168,6 +163,11 @@ Route::prefix('admin')->group(function () {
 
         // Activity Logs
         Route::get('/activity-logs', [\App\Http\Controllers\Admin\ActionLogController::class, 'index'])->name('admin.activity-logs.index');
+
+        // Review Management
+        Route::get('/reviews', [\App\Http\Controllers\Admin\ReviewController::class, 'index'])->name('admin.reviews.index');
+        Route::post('/reviews/{review}/approve', [\App\Http\Controllers\Admin\ReviewController::class, 'approve'])->name('admin.reviews.approve');
+        Route::delete('/reviews/{review}', [\App\Http\Controllers\Admin\ReviewController::class, 'destroy'])->name('admin.reviews.destroy');
     });
 });
 
@@ -220,4 +220,8 @@ Route::post('/partner/payment/{organization}/stripe', [App\Http\Controllers\Onbo
 Route::get('/partner/payment/{organization}/success', [App\Http\Controllers\OnboardingController::class, 'handlePaymentSuccess'])->name('partner.payment.success');
 
 Route::get('/partner/setup/{organization}', [App\Http\Controllers\OnboardingController::class, 'showSetupForm'])->name('partner.setup.show');
+
+// Review Routes
+Route::get('/review/{token}', [App\Http\Controllers\ReviewController::class, 'show'])->name('reviews.show');
+Route::post('/review/{token}', [App\Http\Controllers\ReviewController::class, 'store'])->name('reviews.store');
 

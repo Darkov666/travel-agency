@@ -42,7 +42,7 @@ class TravelContentSeeder extends Seeder
             DB::table('blog_topics')->delete();
         }
 
-        // 2. Ensure Admin User
+        // 2. Ensure Admin User & Organization
         $user = User::first();
         if (!$user) {
             $user = User::create([
@@ -52,10 +52,20 @@ class TravelContentSeeder extends Seeder
             ]);
         }
 
+        $org = \App\Models\Organization::first();
+        if (!$org) {
+            $org = \App\Models\Organization::create([
+                'name' => 'Default Org',
+                'slug' => 'default',
+                'is_active' => true
+            ]);
+        }
+
         // 3. Seed Services (Transfers & Tours)
         $services = [
             [
                 'title' => 'Private Airport Transfer - Hotel Zone',
+                'slug' => 'private-transfer-hotel-zone',
                 'description' => 'Direct, private transportation from Cancun Airport to your hotel in the Hotel Zone. No waiting, no stops.',
                 'price' => 45.00,
                 'price_usd' => 45.00,
@@ -64,9 +74,11 @@ class TravelContentSeeder extends Seeder
                 'type' => 'transfer',
                 'image' => 'https://images.unsplash.com/photo-1549488497-6523cc096535?q=80&w=800',
                 'is_active' => true,
+                'features' => ['Private Vehicle', 'Air Conditioning', 'Bilingual Driver', 'Flight Monitoring']
             ],
             [
                 'title' => 'Private Airport Transfer - Playa del Carmen',
+                'slug' => 'private-transfer-playa-del-carmen',
                 'description' => 'Comfortable private van for your group to Playa del Carmen. Refreshments included.',
                 'price' => 75.00,
                 'price_usd' => 75.00,
@@ -75,9 +87,11 @@ class TravelContentSeeder extends Seeder
                 'type' => 'transfer',
                 'image' => 'https://images.unsplash.com/photo-1566371486490-560ded23b5e4?q=80&w=800',
                 'is_active' => true,
+                'features' => ['Private Vehicle', 'Water & Beer', 'Highway Tolls Included', 'Luxury Van']
             ],
             [
                 'title' => 'Chichen Itza & Cenote Tour',
+                'slug' => 'chichen-itza-cenote-tour',
                 'description' => 'Guided tour to the Mayan pyramid of Kukulkan, followed by a refreshing swim in a sacred cenote.',
                 'price' => 120.00,
                 'price_usd' => 120.00,
@@ -86,9 +100,11 @@ class TravelContentSeeder extends Seeder
                 'type' => 'tour',
                 'image' => 'https://images.unsplash.com/photo-1518638151313-982d2ba5011b?q=80&w=800',
                 'is_active' => true,
+                'features' => ['Roundtrip Transportation', 'Buffet Lunch', 'Certified Guide', 'Entrance Fees']
             ],
             [
                 'title' => 'Luxury Catamaran to Isla Mujeres',
+                'slug' => 'catamaran-isla-mujeres',
                 'description' => 'Sail the Caribbean blue waters with open bar, snorkeling gear, and beach club access.',
                 'price' => 95.00,
                 'price_usd' => 95.00,
@@ -97,9 +113,11 @@ class TravelContentSeeder extends Seeder
                 'type' => 'tour',
                 'image' => 'https://images.unsplash.com/photo-1544551763-46a42a46e865?q=80&w=800',
                 'is_active' => true,
+                'features' => ['Open Bar', 'Snorkeling Equipment', 'Spinnaker Activity', 'Beach Club']
             ],
             [
                 'title' => 'Tulum Ruins & Turtle Snorkeling',
+                'slug' => 'tulum-turtles',
                 'description' => 'Visit the seaside ruins of Tulum and snorkel with turtles in Akumal Bay.',
                 'price' => 110.00,
                 'price_usd' => 110.00,
@@ -108,9 +126,11 @@ class TravelContentSeeder extends Seeder
                 'type' => 'tour',
                 'image' => 'https://images.unsplash.com/photo-1506869640319-fe1a24fd76dc?q=80&w=800',
                 'is_active' => true,
+                'features' => ['Roundtrip Transportation', 'Box Lunch', 'Snorkel Gear', 'Guide']
             ],
             [
                 'title' => 'Private Driver (Hourly)',
+                'slug' => 'private-driver-hourly',
                 'description' => 'Hire a private driver and vehicle for custom city tours, shopping, or dining.',
                 'price' => 50.00,
                 'price_usd' => 50.00,
@@ -119,11 +139,13 @@ class TravelContentSeeder extends Seeder
                 'type' => 'private',
                 'image' => 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=800',
                 'is_active' => true,
+                'features' => ['SUV or Van', 'Bilingual Driver', 'Custom Itinerary', 'Fuel Included']
             ],
         ];
 
         foreach ($services as $service) {
-            Service::create($service);
+            $service['organization_id'] = $org->id;
+            Service::updateOrCreate(['title' => $service['title']], $service);
         }
 
         // 4. Seed Blog Topics
@@ -136,7 +158,7 @@ class TravelContentSeeder extends Seeder
 
         $createdTopics = [];
         foreach ($topics as $topic) {
-            $createdTopics[$topic['slug']] = BlogTopic::create($topic);
+            $createdTopics[$topic['slug']] = BlogTopic::firstOrCreate(['slug' => $topic['slug']], $topic);
         }
 
         // 5. Seed Blog Posts

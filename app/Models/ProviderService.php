@@ -20,6 +20,7 @@ class ProviderService extends Model
         'max_pax',
         'category',
         'is_active',
+        'type',
     ];
 
     protected $casts = [

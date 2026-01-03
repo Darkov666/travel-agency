@@ -111,7 +111,7 @@ const bookSpecial = () => {
         </div>
 
         <div class="p-8 flex flex-col flex-grow">
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">{{ service.title }}</h3>
+            <h3 class="text-xl font-bold text-black dark:text-white mb-3">{{ service.title }}</h3>
             <p class="text-gray-600 dark:text-gray-300 mb-6 line-clamp-3 flex-grow">{{ service.description }}</p>
         
             <div class="mt-auto space-y-4">
@@ -150,7 +150,7 @@ const bookSpecial = () => {
                 </div>
                 
                 <div class="text-center pt-2">
-                    <Link :href="`/services`" class="text-gray-500 hover:text-cyan-600 dark:text-gray-400 dark:hover:text-cyan-300 text-sm underline">
+                    <Link :href="isProduct ? route('shop.show', service.id) : route('services.show', service.id)" class="text-gray-500 hover:text-cyan-600 dark:text-gray-400 dark:hover:text-cyan-300 text-sm underline">
                         {{ t('services.learn_more') }}
                     </Link>
                 </div>

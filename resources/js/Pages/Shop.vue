@@ -80,11 +80,13 @@ const filteredProducts = computed(() => {
 
     <MainLayout>
         <div class="py-12 bg-primary-50 dark:bg-secondary-950 min-h-screen transition-colors duration-300">
+            <div class="py-12 px-4 sm:px-6 lg:px-8 text-center mb-12">
+                <h1 class="text-4xl font-serif font-bold text-black mb-4">{{ $t('shop.title') }}</h1>
+                <p class="text-lg text-black">{{ $t('shop.subtitle') }}</p>
+            </div>
+
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-12">
-                    <h1 class="text-4xl font-serif font-bold text-secondary-900 dark:text-white mb-4">{{ $t('shop.title') }}</h1>
-                    <p class="text-lg text-secondary-600 dark:text-secondary-400">{{ $t('shop.subtitle') }}</p>
-                </div>
+                <!-- Removed inner text-center div as it is now above -->
 
                 <!-- Category Filter -->
                 <div class="flex justify-center mb-10 space-x-2 sm:space-x-4 overflow-x-auto pb-4">

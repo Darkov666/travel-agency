@@ -38,11 +38,16 @@ class HandleInertiaRequests extends Middleware
         $cartCount = 0;
         $user = $request->user();
 
-        if ($user) {
-            $cartCount = \App\Models\Cart::where('user_id', $user->id)->first()?->items()->sum('quantity') ?? 0;
-        } else {
-            $sessionId = $request->session()->getId();
-            $cartCount = \App\Models\Cart::where('session_id', $sessionId)->first()?->items()->sum('quantity') ?? 0;
+        try {
+            if ($user) {
+                $cartCount = \App\Models\Cart::where('user_id', $user->id)->first()?->items()->sum('quantity') ?? 0;
+            } else {
+                $sessionId = $request->session()->getId();
+                $cartCount = \App\Models\Cart::where('session_id', $sessionId)->first()?->items()->sum('quantity') ?? 0;
+            }
+        } catch (\Exception $e) {
+            $cartCount = 0;
+            // Log::error('Cart count error: ' . $e->getMessage());
         }
 
         return [
@@ -56,6 +61,7 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn() => $request->session()->get('success'),
                 'error' => fn() => $request->session()->get('error'),
             ],
+            'tenant' => app()->bound('tenant') ? app('tenant')->only(['id', 'commercial_name', 'fiscal_address', 'representative_email']) : null,
         ];
     }
 }

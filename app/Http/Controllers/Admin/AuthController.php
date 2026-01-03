@@ -54,6 +54,10 @@ class AuthController extends Controller
             return response()->json(['two_factor' => true]);
         }
 
+        if ($request->wantsJson()) {
+            return response()->json(['message' => 'The provided credentials do not match our records.'], 422);
+        }
+
         return back()->withErrors(['email' => 'The provided credentials do not match our records.']);
     }
 
@@ -76,6 +80,8 @@ class AuthController extends Controller
             $user->two_factor_expires_at = null;
             $user->save();
 
+            // \App\Models\ActionLog::log('login', 'User logged in via 2FA');
+
             $request->session()->regenerate();
 
             return redirect()->intended(route('admin.dashboard'));
@@ -86,6 +92,7 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        // \App\Models\ActionLog::log('logout', 'User logged out');
         Auth::guard('web')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

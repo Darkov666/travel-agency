@@ -11,10 +11,14 @@ class ReservationItem extends Model
         'provider_service_id',
         'service_name',
         'provider_name',
+        'zone_id',
         'zone_name',
         'quantity',
         'units',
         'pax',
+        'adults',
+        'children',
+        'infants',
         'passengers_data', // Updated
         'airline', // New
         'arrival_flight_number',
@@ -32,7 +36,13 @@ class ReservationItem extends Model
         'return_time',
         'holder_name',
         'unit_price',
-        'total_price',
+        'total_price', // This seems to be used as total price
+        'total', // Adding this as requested by error
+        'cost', // Adding this as requested by error
+        'vendor_status',
+        'assigned_provider_id',
+        'operational_status',
+        'organization_id',
     ];
 
     protected $casts = [
@@ -49,5 +59,10 @@ class ReservationItem extends Model
     public function providerService()
     {
         return $this->belongsTo(ProviderService::class);
+    }
+
+    public function assignedProvider()
+    {
+        return $this->belongsTo(Provider::class, 'assigned_provider_id');
     }
 }

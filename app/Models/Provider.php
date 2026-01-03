@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\BelongsToOrganization;
 
 class Provider extends Model
 {
-    use HasFactory;
+    use HasFactory, BelongsToOrganization;
 
     protected $fillable = [
         'name',
@@ -25,6 +26,7 @@ class Provider extends Model
         'tax_compliance_path',
         'provider_type',
         'priority',
+        'organization_id',
     ];
 
     protected $casts = [

@@ -34,11 +34,13 @@ const selectTopic = (topicSlug) => {
 
     <MainLayout>
         <div class="py-12 bg-primary-50 dark:bg-secondary-950 min-h-screen transition-colors duration-300">
+            <div class="py-12 px-4 sm:px-6 lg:px-8 text-center mb-12">
+                <h1 class="text-4xl font-serif font-bold text-black mb-4">Nuestro Blog</h1>
+                <p class="text-lg text-black">Recursos, consejos y reflexiones para tu bienestar.</p>
+            </div>
+
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-12">
-                    <h1 class="text-4xl font-serif font-bold text-secondary-900 dark:text-white mb-4">Nuestro Blog</h1>
-                    <p class="text-lg text-secondary-600 dark:text-secondary-400">Recursos, consejos y reflexiones para tu bienestar.</p>
-                </div>
+                <!-- Removed inner header div -->
 
                 <!-- Search and Filter -->
                 <div class="flex flex-col md:flex-row justify-between items-center mb-10 space-y-4 md:space-y-0">
@@ -50,7 +52,7 @@ const selectTopic = (topicSlug) => {
                                 'px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap',
                                 selectedTopic === 'all'
                                     ? 'bg-primary-600 text-white shadow-md' 
-                                    : 'bg-white dark:bg-secondary-800 text-secondary-600 dark:text-secondary-300 hover:bg-primary-50 dark:hover:bg-secondary-700'
+                                    : 'bg-white dark:bg-gray-700 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600'
                             ]"
                         >
                             Todos
@@ -106,7 +108,7 @@ const selectTopic = (topicSlug) => {
                                 <span>{{ post.read_time || '5 min' }} de lectura</span>
                             </div>
                             <Link :href="`/blog/${post.slug}`" class="block">
-                                <h3 class="text-xl font-serif font-bold text-secondary-900 dark:text-white mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                                <h3 class="text-xl font-serif font-bold text-black mb-2 group-hover:text-primary-600 transition-colors">
                                     {{ post.title }}
                                 </h3>
                             </Link>

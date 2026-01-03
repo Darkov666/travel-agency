@@ -26,15 +26,15 @@ const formatCurrency = (value) => {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
 };
 
+const depositAmount = computed(() => props.reservation.total_amount * 0.20);
+
 const amountToPayNow = computed(() => {
     if (paymentMethod.value === 'cash') {
-        // Cash always deposit only? User said: "All services charged upfront commission... or full amount via pay pal. also can pay rest in cash".
-        // Logic: Transfer/PayPal can be Full or Split. Cash is Deposit Only (since rest is cash on arrival).
-        return props.reservation.total_amount * 0.20;
+        return depositAmount.value;
     }
     
     if (paymentChoice.value === 'deposit') {
-        return props.reservation.total_amount * 0.20;
+        return depositAmount.value;
     }
     return props.reservation.total_amount;
 });
@@ -60,6 +60,14 @@ const amountToPayNow = computed(() => {
                         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-100 dark:border-gray-700">
                              <!-- Options -->
                              <div class="space-y-4">
+                                <label class="flex items-center p-4 border rounded-lg cursor-pointer transition hover:bg-gray-50 dark:hover:bg-gray-700" :class="{'border-primary-500 ring-1 ring-primary-500': paymentMethod === 'stripe', 'border-gray-200 dark:border-gray-600': paymentMethod !== 'stripe'}">
+                                    <input type="radio" value="stripe" v-model="paymentMethod" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300">
+                                    <div class="ml-4">
+                                        <span class="block text-sm font-medium text-gray-900 dark:text-white">Credit Card (Stripe)</span>
+                                        <span class="block text-sm text-gray-500">Secure payment via Stripe.</span>
+                                    </div>
+                                </label>
+
                                 <label class="flex items-center p-4 border rounded-lg cursor-pointer transition hover:bg-gray-50 dark:hover:bg-gray-700" :class="{'border-primary-500 ring-1 ring-primary-500': paymentMethod === 'transfer', 'border-gray-200 dark:border-gray-600': paymentMethod !== 'transfer'}">
                                     <input type="radio" value="transfer" v-model="paymentMethod" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300">
                                     <div class="ml-4">
