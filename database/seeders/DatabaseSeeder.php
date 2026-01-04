@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             ServiceSeeder::class,
             PackageSeeder::class,
+            BlogTopicSeeder::class, // Topics before posts
             BlogPostSeeder::class,
             AdditionalBlogPostsSeeder::class,
             InteractionsSeeder::class,

@@ -61,7 +61,7 @@ class ProviderController extends Controller
     public function edit(Provider $provider)
     {
         return Inertia::render('Admin/Providers/Form', [
-            'provider' => $provider->load(['vehicles', 'providerServices.service', 'providerServices.zone']),
+            'provider' => $provider->load(['vehicles', 'providerServices.service', 'providerServices.zone', 'organization']),
             'availableServices' => \App\Models\Service::select('id', 'title', 'type')->get(), // Global services
             'availableZones' => \App\Models\Zone::select('id', 'name')->get(), // For linking prices
         ]);
@@ -82,7 +82,12 @@ class ProviderController extends Controller
             'tax_compliance' => 'nullable|file|mimes:pdf,jpg,png|max:5120',
             'priority' => 'nullable|integer|between:1,3',
             'is_active' => 'boolean',
+            'exchange_rate' => 'nullable|numeric|min:0',
         ]);
+
+        if ($request->has('exchange_rate') && $provider->organization) {
+            $provider->organization->update(['exchange_rate' => $validated['exchange_rate']]);
+        }
 
         if ($request->hasFile('logo')) {
             // Delete old

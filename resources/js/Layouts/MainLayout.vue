@@ -21,10 +21,14 @@ const toggleDarkMode = () => {
     }
 };
 
-const changeLanguage = (lang) => {
+const changeLanguage = async (lang) => {
     currentLang.value = lang;
-    loadLanguageAsync(lang);
-    localStorage.setItem('locale', lang);
+    try {
+        await loadLanguageAsync(lang);
+        localStorage.setItem('locale', lang);
+    } catch (error) {
+        console.error('Error loading language:', error);
+    }
 };
 
 import { useCartStore } from '@/Stores/cart';
@@ -96,7 +100,7 @@ watch(() => page.props.flash, (flash) => {
 <template>
     <div class="min-h-screen bg-primary-50 dark:bg-secondary-950 font-sans text-secondary-700 dark:text-secondary-200 transition-colors duration-300">
         <!-- Navigation -->
-        <nav class="bg-cyan-600 dark:bg-gray-900 border-b border-cyan-500 dark:border-gray-800 sticky top-0 z-50 transition-colors duration-300 shadow-md">
+        <nav :key="currentLang" class="bg-cyan-600 dark:bg-gray-900 border-b border-cyan-500 dark:border-gray-800 sticky top-0 z-50 transition-colors duration-300 shadow-md">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-20">
                     <div class="flex">
@@ -124,8 +128,8 @@ watch(() => page.props.flash, (flash) => {
                             <Link href="/contact" :class="{'border-white text-white dark:border-cyan-400 dark:text-white': $page.url.startsWith('/contact'), 'border-transparent text-cyan-50 dark:text-gray-300 hover:text-white dark:hover:text-white hover:border-cyan-200': !$page.url.startsWith('/contact')}" class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-bold leading-5 transition-colors duration-300 ease-in-out">
                                 {{ $t('nav.contact') }}
                             </Link>
-                            <Link href="/partner/register" class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-bold leading-5 transition-colors duration-300 ease-in-out border-transparent text-cyan-50 dark:text-gray-300 hover:text-white dark:hover:text-white hover:border-cyan-200">
-                                Partners
+                            <Link href="/partners" class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-bold leading-5 transition-colors duration-300 ease-in-out border-transparent text-cyan-50 dark:text-gray-300 hover:text-white dark:hover:text-white hover:border-cyan-200">
+                                {{ $t('nav.partners') }}
                             </Link>
                         </div>
                     </div>
@@ -183,7 +187,7 @@ watch(() => page.props.flash, (flash) => {
                     <Link href="/shop" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-secondary-600 dark:text-secondary-400 hover:text-secondary-800 dark:hover:text-white hover:bg-primary-50 dark:hover:bg-secondary-800 hover:border-primary-300 transition duration-150 ease-in-out">{{ $t('nav.shop') }}</Link>
                     <Link href="/blog" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-secondary-600 dark:text-secondary-400 hover:text-secondary-800 dark:hover:text-white hover:bg-primary-50 dark:hover:bg-secondary-800 hover:border-primary-300 transition duration-150 ease-in-out">{{ $t('nav.blog') }}</Link>
                     <Link href="/contact" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-secondary-600 dark:text-secondary-400 hover:text-secondary-800 dark:hover:text-white hover:bg-primary-50 dark:hover:bg-secondary-800 hover:border-primary-300 transition duration-150 ease-in-out">{{ $t('nav.contact') }}</Link>
-                    <Link v-if="!$page.props.tenant" href="/partner/register" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-secondary-600 dark:text-secondary-400 hover:text-secondary-800 dark:hover:text-white hover:bg-primary-50 dark:hover:bg-secondary-800 hover:border-primary-300 transition duration-150 ease-in-out">Partners</Link>
+                    <Link v-if="!$page.props.tenant" href="/partners" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-secondary-600 dark:text-secondary-400 hover:text-secondary-800 dark:hover:text-white hover:bg-primary-50 dark:hover:bg-secondary-800 hover:border-primary-300 transition duration-150 ease-in-out">{{ $t('nav.partners') }}</Link>
                     <Link v-if="!$page.props.tenant" href="/admin/login" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-secondary-600 dark:text-secondary-400 hover:text-secondary-800 dark:hover:text-white hover:bg-primary-50 dark:hover:bg-secondary-800 hover:border-primary-300 transition duration-150 ease-in-out">{{ $t('nav.login') }}</Link>
                 </div>
                 <!-- Mobile Toggles -->

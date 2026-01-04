@@ -19,12 +19,18 @@ class Service extends Model
         'is_active',
         'image',
         'features',
+        'net_price',
+        'commission',
+        'commission_type',
+        'currency',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'price' => 'decimal:2',
         'price_mxn' => 'decimal:2',
+        'net_price' => 'decimal:2',
+        'commission' => 'decimal:2',
         'features' => 'array',
     ];
 

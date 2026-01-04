@@ -49,23 +49,23 @@ const selectTopic = (topicSlug) => {
                         <button 
                             @click="selectTopic('all')"
                             :class="[
-                                'px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap',
+                                'px-6 py-2 rounded-full text-sm font-bold transition-colors whitespace-nowrap border-2',
                                 selectedTopic === 'all'
-                                    ? 'bg-primary-600 text-white shadow-md' 
-                                    : 'bg-white dark:bg-gray-700 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600'
+                                    ? 'bg-cyan-600 border-cyan-600 text-white shadow-md' 
+                                    : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
                             ]"
                         >
-                            Todos
+                            {{ $t('shop.all') }}
                         </button>
                         <button 
                             v-for="topic in topics" 
                             :key="topic.id"
                             @click="selectTopic(topic.slug)"
                             :class="[
-                                'px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap',
+                                'px-6 py-2 rounded-full text-sm font-bold transition-colors whitespace-nowrap border-2',
                                 selectedTopic === topic.slug
-                                    ? 'bg-primary-600 text-white shadow-md' 
-                                    : 'bg-white dark:bg-secondary-800 text-secondary-600 dark:text-secondary-300 hover:bg-primary-50 dark:hover:bg-secondary-700'
+                                    ? 'bg-cyan-600 border-cyan-600 text-white shadow-md' 
+                                    : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
                             ]"
                         >
                             {{ topic.name }}

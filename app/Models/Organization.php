@@ -30,7 +30,8 @@ class Organization extends Model
         'last_payment_date',
         'next_payment_date',
         'monthly_fee',
-        'commission_rate'
+        'commission_rate',
+        'exchange_rate',
     ];
 
     protected $casts = [
@@ -42,6 +43,7 @@ class Organization extends Model
         'next_payment_date' => 'date',
         'monthly_fee' => 'decimal:2',
         'commission_rate' => 'decimal:2',
+        'exchange_rate' => 'decimal:4',
     ];
 
     public function isSuspended(): bool

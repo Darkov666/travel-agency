@@ -31,6 +31,7 @@ const generalForm = useForm({
     full_address: props.provider?.full_address || '',
     priority: props.provider?.priority || 1,
     is_active: props.provider?.is_active ?? true,
+    exchange_rate: props.provider?.organization?.exchange_rate || 20.0,
     logo: null,
     tax_compliance: null,
 });
@@ -247,6 +248,10 @@ const deleteService = async (id) => {
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Partner ID (Identifier)</label>
                         <input v-model="generalForm.partner_id" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Exchange Rate (USD to MXN)</label>
+                        <input v-model="generalForm.exchange_rate" type="number" step="0.0001" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:text-white dark:border-gray-600">
                     </div>
                      <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Provider Type</label>

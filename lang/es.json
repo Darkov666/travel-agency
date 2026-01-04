@@ -6,6 +6,7 @@
     "nav.contact": "Contacto",
     "nav.register": "Registrarse",
     "nav.login": "Entrar",
+    "nav.partners": "Socios",
     "footer.description": "Traslados premium de aeropuerto y excursiones exclusivas en Cancún y la Riviera Maya.",
     "footer.quick_links": "Enlaces Rápidos",
     "footer.contact": "Contacto",
@@ -23,5 +24,8 @@
     "services.all": "Todos",
     "services.transfers": "Traslados",
     "services.tours": "Excursiones",
-    "services.private": "Servicio Privado"
+    "services.private": "Servicio Privado",
+    "blog.published": "Publicado",
+    "blog.draft": "Borrador",
+    "blog.author": "Autor"
 }

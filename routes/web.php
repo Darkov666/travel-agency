@@ -18,11 +18,15 @@ Route::get('/', function () {
         ]);
     }
 
+    // Fetch Content Blocks for Welcome Page
+    $contentBlocks = \App\Models\ContentBlock::where('group', 'home')->get()->pluck('value', 'key');
+
     return Inertia::render('Welcome', [
         'featuredServices' => Service::where('is_active', true)->take(3)->get(),
         'latestPosts' => BlogPost::where('is_published', true)->latest('published_at')->take(3)->get(),
         'latestReviews' => \App\Models\Review::where('is_approved', true)->latest()->take(5)->get(),
         'zones' => \App\Models\Zone::all(['name', 'coordinates']), // Pass coordinates for geofencing
+        'contentBlocks' => $contentBlocks,
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
@@ -115,6 +119,14 @@ Route::prefix('admin')->group(function () {
 
         Route::post('/logout', [\App\Http\Controllers\Admin\AuthController::class, 'logout'])->name('admin.logout');
 
+        // Content Management (CMS)
+        Route::get('/content', [\App\Http\Controllers\Admin\ContentController::class, 'index'])->name('admin.content.index');
+        Route::post('/content', [\App\Http\Controllers\Admin\ContentController::class, 'update'])->name('admin.content.update');
+
+        // Blog Management
+        Route::resource('/blog', \App\Http\Controllers\Admin\BlogController::class)->names('admin.blog');
+        Route::resource('/blog-topics', \App\Http\Controllers\Admin\BlogTopicController::class)->names('admin.blog-topics');
+
         // Zone Editor
         Route::get('/zones', [\App\Http\Controllers\Admin\ZoneController::class, 'index'])->name('admin.zones.index');
         Route::post('/zones', [\App\Http\Controllers\Admin\ZoneController::class, 'store'])->name('admin.zones.store');
@@ -177,6 +189,12 @@ Route::prefix('admin')->group(function () {
         Route::post('/comments/{comment}/approve', [\App\Http\Controllers\Admin\CommentController::class, 'approve'])->name('admin.comments.approve');
         Route::post('/comments/{comment}/reject', [\App\Http\Controllers\Admin\CommentController::class, 'reject'])->name('admin.comments.reject');
         Route::delete('/comments/{comment}', [\App\Http\Controllers\Admin\CommentController::class, 'destroy'])->name('admin.comments.destroy');
+
+        // Product Management (Shop)
+        Route::resource('/products', \App\Http\Controllers\Admin\ProductController::class)->names('admin.products');
+
+        // Service Management
+        Route::resource('/items', \App\Http\Controllers\Admin\ServiceController::class)->names('admin.services');
     });
 
     // Public Comments
@@ -231,6 +249,10 @@ Route::post('/contact', [App\Http\Controllers\ContactController::class, 'store']
 
 // SaaS Onboarding Routes
 // Seed Routes Removed
+
+Route::get('/partners', function () {
+    return Inertia::render('Partners');
+})->name('partners');
 
 Route::get('/partner/payment/{organization}', [App\Http\Controllers\OnboardingController::class, 'showPayment'])->name('partner.payment.show');
 Route::post('/partner/payment/{organization}/stripe', [App\Http\Controllers\OnboardingController::class, 'initiateStripePayment'])->name('partner.payment.stripe');
