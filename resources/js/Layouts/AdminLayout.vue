@@ -4,6 +4,7 @@ import { ref, computed } from 'vue';
 
 const user = computed(() => usePage().props.auth.user);
 const showingSidebar = ref(false);
+const showingNotifications = ref(false);
 
 const navigation = [
     { name: 'Dashboard', href: route('admin.dashboard'), routeName: 'admin.dashboard', icon: 'fas fa-home', roles: ['root', 'admin', 'supervisor', 'operator'] },
@@ -13,6 +14,7 @@ const navigation = [
     { name: 'Zones Editor', href: route('admin.zones.index'), routeName: 'admin.zones.*', icon: 'fas fa-map-marked-alt', roles: ['root', 'admin'] },
     { name: 'Providers', href: route('admin.providers.index'), routeName: 'admin.providers.*', icon: 'fas fa-building', roles: ['root', 'admin'] },
     { name: 'Service Ops', href: route('admin.reservations.index'), routeName: 'admin.reservations.*', icon: 'fas fa-tasks', roles: ['root', 'admin', 'supervisor'] },
+    { name: 'Comments', href: route('admin.comments.index'), routeName: 'admin.comments.*', icon: 'fas fa-comments', roles: ['root', 'admin'] },
 ];
 
 const visibleNavigation = computed(() => {
@@ -46,9 +48,14 @@ const logout = () => {
                         <svg v-if="item.name === 'Approvals'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
                         <svg v-if="item.name === 'Activity Log'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         <svg v-if="item.name === 'Providers'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                         <svg v-if="item.name === 'Service Ops'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                        <svg v-if="item.name === 'Service Ops'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                        <svg v-if="item.name === 'Comments'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path></svg>
                     </span>
                     {{ item.name }}
+                    <span v-if="item.name === 'Comments' && $page.props.auth.user.unread_notifications_count > 0" 
+                        class="ml-auto inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
+                        {{ $page.props.auth.user.unread_notifications_count }}
+                    </span>
                 </Link>
             </nav>
 
@@ -77,7 +84,36 @@ const logout = () => {
                     <slot name="header" />
                 </div>
 
-                <div class="flex items-center">
+                <div class="flex items-center space-x-4">
+                    <!-- Notifications Dropdown -->
+                    <div class="relative ml-3">
+                        <button @click="showingNotifications = !showingNotifications" class="p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 relative">
+                            <span class="sr-only">View notifications</span>
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                            </svg>
+                            <span v-if="$page.props.auth.user.unread_notifications_count > 0" class="absolute top-0 right-0 block h-2 w-2 rounded-full ring-2 ring-white bg-red-500"></span>
+                        </button>
+
+                        <div v-if="showingNotifications" 
+                             class="origin-top-right absolute right-0 mt-2 w-80 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+                            <div v-if="$page.props.auth.notifications && $page.props.auth.notifications.length > 0">
+                                    <Link v-for="notification in $page.props.auth.notifications" :key="notification.id"
+                                          :href="notification.data.action_url"
+                                          class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0 transition-colors">
+                                        <p class="text-sm text-gray-900" 
+                                           :class="{'font-bold': !notification.read_at, 'font-normal': notification.read_at}">
+                                            {{ notification.data.message }}
+                                        </p>
+                                        <p class="text-xs text-gray-500 mt-1">{{ new Date(notification.created_at).toLocaleString() }}</p>
+                                    </Link>
+                            </div>
+                            <div v-else class="px-4 py-3 text-sm text-gray-500 text-center">
+                                No new notifications
+                            </div>
+                        </div>
+                    </div>
+
                      <Link href="/admin/logout" method="post" as="button" class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
                         Logout
                     </Link>

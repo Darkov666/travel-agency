@@ -15,6 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\HandleInertiaRequests::class,
             \App\Http\Middleware\IdentifyTenant::class,
         ]);
+        $middleware->validateCsrfTokens(except: [
+            'stripe/*',
+        ]);
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
         ]);

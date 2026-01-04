@@ -150,7 +150,7 @@ const bookSpecial = () => {
                 </div>
                 
                 <div class="text-center pt-2">
-                    <Link :href="isProduct ? route('shop.show', service.id) : route('services.show', service.id)" class="text-gray-500 hover:text-cyan-600 dark:text-gray-400 dark:hover:text-cyan-300 text-sm underline">
+                    <Link :href="route('services.show', service.id)" class="text-gray-500 hover:text-cyan-600 dark:text-gray-400 dark:hover:text-cyan-300 text-sm underline">
                         {{ t('services.learn_more') }}
                     </Link>
                 </div>

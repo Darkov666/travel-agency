@@ -40,6 +40,11 @@ class Provider extends Model
         return $this->hasMany(Vehicle::class);
     }
 
+    public function users()
+    {
+        return $this->hasMany(User::class);
+    }
+
     public function providerServices()
     {
         return $this->hasMany(ProviderService::class);

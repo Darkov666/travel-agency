@@ -30,6 +30,10 @@ const formatCurrency = (value) => {
                         <div class="text-gray-500 text-sm uppercase font-bold tracking-wider">Total Revenue</div>
                         <div class="text-2xl font-bold dark:text-white mt-2">{{ formatCurrency(stats?.total_revenue || 0) }}</div>
                     </div>
+                     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
+                        <div class="text-gray-500 text-sm uppercase font-bold tracking-wider">Commission (Est.)</div>
+                        <div class="text-2xl font-bold text-green-600 mt-2">{{ formatCurrency(stats?.total_commission || 0) }}</div>
+                    </div>
                     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
                         <div class="text-gray-500 text-sm uppercase font-bold tracking-wider">Organizations</div>
                         <div class="text-2xl font-bold dark:text-white mt-2">{{ stats?.total_orgs || 0 }}</div>

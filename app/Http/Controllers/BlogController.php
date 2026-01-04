@@ -49,12 +49,23 @@ class BlogController extends Controller
 
     public function show($slug)
     {
-        $post = BlogPost::with(['topic', 'author', 'comments.user'])
+        $post = BlogPost::with([
+            'topic',
+            'author',
+            'comments' => function ($q) {
+                $q->where('is_approved', true)->with('user');
+            }
+        ])
             ->where('slug', $slug)
             ->where('is_published', true)
             ->firstOrFail();
 
-        $post->loadCount(['likes', 'comments']);
+        $post->loadCount([
+            'likes',
+            'comments' => function ($q) {
+                $q->where('is_approved', true);
+            }
+        ]);
 
         $isLiked = false;
         $isSaved = false;

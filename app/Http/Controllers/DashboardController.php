@@ -42,7 +42,8 @@ class DashboardController extends Controller
                 'suspended_orgs' => Organization::where('subscription_status', 'suspended')->count(),
                 'total_users' => \App\Models\User::count(),
                 'total_reservations' => \App\Models\Reservation::count(),
-                'total_revenue' => \App\Models\Reservation::sum('total_amount'), // Simple sum
+                'total_revenue' => \App\Models\Reservation::sum('total_amount'),
+                'total_commission' => \App\Models\Reservation::sum('total_amount') * 0.10, // Approx 10% commission
                 'pending_changes' => \App\Models\ChangeRequest::where('status', 'pending')->count(),
             ]
         ]);

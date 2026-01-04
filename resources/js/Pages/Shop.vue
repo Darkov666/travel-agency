@@ -25,6 +25,8 @@ const products = [
         title: 'Chichen Itza Deluxe Tour',
         description: 'Guided tour to the wonder of the world with buffet lunch and cenote visit included.',
         price: 129,
+        price_mxn: 2580,
+        price_usd: 129,
         currency: 'USD',
         type: 'tours',
         image: 'https://images.unsplash.com/photo-1518638151313-982d2ba5011b?q=80&w=800&auto=format&fit=crop'
@@ -34,6 +36,8 @@ const products = [
         title: 'Xcaret Plus Package',
         description: 'Full day access to Xcaret park with buffet lunch and night show.',
         price: 159,
+        price_mxn: 3180,
+        price_usd: 159,
         currency: 'USD',
         type: 'packages',
         image: 'https://images.unsplash.com/photo-1534151759604-03738dbb772c?q=80&w=800&auto=format&fit=crop'
@@ -43,6 +47,8 @@ const products = [
         title: 'Catamaran to Isla Mujeres',
         description: 'Sail the Caribbean sea, snorkel in the reef and enjoy an open bar.',
         price: 89,
+        price_mxn: 1780,
+        price_usd: 89,
         currency: 'USD',
         type: 'tours',
         image: 'https://images.unsplash.com/photo-1544551763-46a42a46e865?q=80&w=800&auto=format&fit=crop'
@@ -52,6 +58,8 @@ const products = [
         title: 'Cancun Sunny Cap',
         description: 'Exclusive branded cap to protect you from the sun in style.',
         price: 25,
+        price_mxn: 500,
+        price_usd: 25,
         currency: 'USD',
         type: 'merchandise',
         image: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?q=80&w=800&auto=format&fit=crop'
@@ -61,6 +69,8 @@ const products = [
         title: 'Tulum & Coba Expedition',
         description: 'Explore two ancient Mayan cities in one day. Transport and guide included.',
         price: 110,
+        price_mxn: 2200,
+        price_usd: 110,
         currency: 'USD',
         type: 'tours',
         image: 'https://images.unsplash.com/photo-1506869640319-fe1a24fd76dc?q=80&w=800&auto=format&fit=crop'

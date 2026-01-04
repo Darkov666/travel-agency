@@ -50,11 +50,20 @@ class HandleInertiaRequests extends Middleware
             // Log::error('Cart count error: ' . $e->getMessage());
         }
 
+        $auth = [
+            'user' => $request->user(),
+        ];
+
+        if ($user) {
+            $auth['user'] = $user->loadCount('unreadNotifications');
+            $auth['pendingCommentsCount'] = \App\Models\Comment::where('is_approved', false)->count();
+            // Fetch last 4 notifications (read or unread)
+            $auth['notifications'] = $user->notifications()->latest()->take(4)->get();
+        }
+
         return [
             ...parent::share($request),
-            'auth' => [
-                'user' => $request->user(),
-            ],
+            'auth' => $auth,
             'cartCount' => $cartCount,
             'locale' => app()->getLocale(),
             'flash' => [

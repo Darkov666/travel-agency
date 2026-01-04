@@ -88,6 +88,8 @@ Route::middleware([
 Route::get('/workshops', [App\Http\Controllers\WorkshopController::class, 'index'])->name('workshops.index');
 Route::post('/workshops/meeting', [App\Http\Controllers\WorkshopController::class, 'requestMeeting'])->name('workshops.meeting');
 
+Route::post('/stripe/webhook', [App\Http\Controllers\StripeWebhookController::class, 'handleWebhook'])->name('stripe.webhook');
+
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 Route::post('/blog/{slug}/comment', [BlogController::class, 'comment'])->name('blog.comment');
@@ -168,7 +170,31 @@ Route::prefix('admin')->group(function () {
         Route::get('/reviews', [\App\Http\Controllers\Admin\ReviewController::class, 'index'])->name('admin.reviews.index');
         Route::post('/reviews/{review}/approve', [\App\Http\Controllers\Admin\ReviewController::class, 'approve'])->name('admin.reviews.approve');
         Route::delete('/reviews/{review}', [\App\Http\Controllers\Admin\ReviewController::class, 'destroy'])->name('admin.reviews.destroy');
+
+        // Comment Management
+        Route::get('/comments', [\App\Http\Controllers\Admin\CommentController::class, 'index'])->name('admin.comments.index');
+        Route::get('/comments/{comment}', [\App\Http\Controllers\Admin\CommentController::class, 'show'])->name('admin.comments.show');
+        Route::post('/comments/{comment}/approve', [\App\Http\Controllers\Admin\CommentController::class, 'approve'])->name('admin.comments.approve');
+        Route::post('/comments/{comment}/reject', [\App\Http\Controllers\Admin\CommentController::class, 'reject'])->name('admin.comments.reject');
+        Route::delete('/comments/{comment}', [\App\Http\Controllers\Admin\CommentController::class, 'destroy'])->name('admin.comments.destroy');
     });
+
+    // Public Comments
+    Route::post('/comments', [\App\Http\Controllers\CommentController::class, 'store'])->name('comments.store');
+    Route::post('/comments/{comment}/like', [\App\Http\Controllers\CommentController::class, 'like'])->name('comments.like');
+
+    // Signed Email Actions
+    Route::get('/comments/{comment}/approve', [\App\Http\Controllers\Admin\CommentController::class, 'emailApprove'])
+        ->name('comments.email.approve')
+        ->middleware('signed');
+
+    Route::get('/comments/{comment}/reject', [\App\Http\Controllers\Admin\CommentController::class, 'emailReject'])
+        ->name('comments.email.reject')
+        ->middleware('signed');
+
+    Route::get('/comments/{comment}/delete', [\App\Http\Controllers\Admin\CommentController::class, 'emailDelete'])
+        ->name('comments.email.delete')
+        ->middleware('signed');
 });
 
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
@@ -204,16 +230,7 @@ Route::get('/contact', [App\Http\Controllers\ContactController::class, 'index'])
 Route::post('/contact', [App\Http\Controllers\ContactController::class, 'store'])->name('contact.store');
 
 // SaaS Onboarding Routes
-Route::get('/partner/register', [App\Http\Controllers\OnboardingController::class, 'showRegistrationForm'])->name('partner.register');
-Route::post('/partner/register', [App\Http\Controllers\OnboardingController::class, 'storeOrganization'])->name('partner.store');
-
-Route::get('/debug-db', function () {
-    return [
-        'connection' => \Illuminate\Support\Facades\DB::getDefaultConnection(),
-        'database' => \Illuminate\Support\Facades\DB::connection()->getDatabaseName(),
-        'host' => \Illuminate\Support\Facades\DB::getConfig('host'),
-    ];
-});
+// Seed Routes Removed
 
 Route::get('/partner/payment/{organization}', [App\Http\Controllers\OnboardingController::class, 'showPayment'])->name('partner.payment.show');
 Route::post('/partner/payment/{organization}/stripe', [App\Http\Controllers\OnboardingController::class, 'initiateStripePayment'])->name('partner.payment.stripe');
