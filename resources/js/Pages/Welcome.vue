@@ -4,7 +4,7 @@ import { Head, Link } from '@inertiajs/vue3';
 import MainLayout from '@/Layouts/MainLayout.vue';
 import SearchWidget from '@/Components/SearchWidget.vue';
 import ContactSection from '@/Components/ContactSection.vue';
-// import ServiceCard from '@/Components/ServiceCard.vue'; // Temporarily disabled until updated
+import ServiceCard from '@/Components/ServiceCard.vue';
 // import { wTrans } from 'laravel-vue-i18n';
 
 defineProps({
@@ -45,20 +45,104 @@ const safeJsonParse = (str) => {
             </div>
 
             <!-- Content -->
-            <!-- ... (unchanged) -->
+            <!-- Content -->
+            <!-- Content -->
+            <div class="relative h-full flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 z-10" :class="[contentBlocks['home_hero_align'] || 'text-center']">
+                <h1 class="font-bold text-white mb-6 drop-shadow-lg tracking-tight animate-fade-in-up" :class="[contentBlocks['home_hero_font_family'] || 'font-serif', contentBlocks['home_hero_title_size'] || 'text-4xl sm:text-5xl md:text-7xl']">
+                    {{ (contentBlocks && contentBlocks['home_hero_title']) ? contentBlocks['home_hero_title'] : 'Discover the Riviera Maya' }}
+                </h1>
+                <p class="text-white/90 max-w-3xl mb-10 drop-shadow-md font-light animate-fade-in-up delay-100" :class="[contentBlocks['home_hero_subtitle_size'] || 'text-xl sm:text-2xl', {'mx-auto': (contentBlocks['home_hero_align'] || 'text-center') === 'text-center'}]">
+                    {{ (contentBlocks && contentBlocks['home_hero_subtitle']) ? contentBlocks['home_hero_subtitle'] : 'Experience exclusive tours, private transfers, and unforgettable adventures in paradise.' }}
+                </p>
+                <div class="animate-fade-in-up delay-200">
+                     <Link href="/services" class="px-8 py-4 bg-primary-500 hover:bg-primary-600 text-white text-lg font-bold rounded-full shadow-xl transition transform hover:scale-105 hover:shadow-2xl flex items-center gap-2 inline-flex">
+                        View All Services
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                    </Link>
+                </div>
+            </div>
         </div>
 
         <!-- Search Widget (Floating overlap) -->
         <SearchWidget :zones="zones" />
 
-        <!-- ... (Value Props unchanged) ... -->
+        <!-- Featured Services & Value Props -->
+        <div class="py-16 bg-gray-50 dark:bg-gray-900">
+             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+                     <!-- Value Props (Icons) -->
+                     <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md transform hover:-translate-y-1 transition duration-300" :class="[contentBlocks['home_cards_align'] || 'text-center']">
+                         <div class="w-16 h-16 bg-cyan-100 text-cyan-600 rounded-full flex items-center justify-center mb-4 text-2xl overflow-hidden" :class="{'mx-auto': (contentBlocks['home_cards_align'] || 'text-center') === 'text-center'}">
+                             <img v-if="contentBlocks['home_card1_image']" :src="contentBlocks['home_card1_image']" class="w-full h-full object-cover">
+                             <span v-else>{{ contentBlocks['home_card1_icon'] || '✈️' }}</span>
+                         </div>
+                         <h3 class="font-bold text-gray-900 dark:text-white mb-2" :class="[contentBlocks['home_cards_font_family'] || 'font-sans', contentBlocks['home_cards_title_size'] || 'text-xl']">{{ contentBlocks['home_card1_title'] || 'Private Transfers' }}</h3>
+                         <p class="text-gray-600 dark:text-gray-400" :class="[contentBlocks['home_cards_text_size'] || 'text-base']">{{ contentBlocks['home_card1_text'] || 'Reliable airport pickup and drop-off in luxury vehicles.' }}</p>
+                     </div>
+                      <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md transform hover:-translate-y-1 transition duration-300" :class="[contentBlocks['home_cards_align'] || 'text-center']">
+                         <div class="w-16 h-16 bg-secondary-100 text-secondary-600 rounded-full flex items-center justify-center mb-4 text-2xl overflow-hidden" :class="{'mx-auto': (contentBlocks['home_cards_align'] || 'text-center') === 'text-center'}">
+                             <img v-if="contentBlocks['home_card2_image']" :src="contentBlocks['home_card2_image']" class="w-full h-full object-cover">
+                             <span v-else>{{ contentBlocks['home_card2_icon'] || '🗿' }}</span>
+                         </div>
+                         <h3 class="font-bold text-gray-900 dark:text-white mb-2" :class="[contentBlocks['home_cards_font_family'] || 'font-sans', contentBlocks['home_cards_title_size'] || 'text-xl']">{{ contentBlocks['home_card2_title'] || 'Exclusive Tours' }}</h3>
+                         <p class="text-gray-600 dark:text-gray-400" :class="[contentBlocks['home_cards_text_size'] || 'text-base']">{{ contentBlocks['home_card2_text'] || 'Discover hidden gems and ancient ruins with expert guides.' }}</p>
+                     </div>
+                      <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md transform hover:-translate-y-1 transition duration-300" :class="[contentBlocks['home_cards_align'] || 'text-center']">
+                         <div class="w-16 h-16 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mb-4 text-2xl overflow-hidden" :class="{'mx-auto': (contentBlocks['home_cards_align'] || 'text-center') === 'text-center'}">
+                             <img v-if="contentBlocks['home_card3_image']" :src="contentBlocks['home_card3_image']" class="w-full h-full object-cover">
+                             <span v-else>{{ contentBlocks['home_card3_icon'] || '💎' }}</span>
+                         </div>
+                         <h3 class="font-bold text-gray-900 dark:text-white mb-2" :class="[contentBlocks['home_cards_font_family'] || 'font-sans', contentBlocks['home_cards_title_size'] || 'text-xl']">{{ contentBlocks['home_card3_title'] || 'VIP Service' }}</h3>
+                         <p class="text-gray-600 dark:text-gray-400" :class="[contentBlocks['home_cards_text_size'] || 'text-base']">{{ contentBlocks['home_card3_text'] || 'Personalized attention and 24/7 support for your trip.' }}</p>
+                     </div>
+                 </div>
+
+                 <!-- Featured Services List -->
+                 <div v-if="featuredServices && featuredServices.length > 0">
+                     <div class="mb-10" :class="[
+                         contentBlocks['home_featured_align'] || 'text-center',
+                         contentBlocks['home_featured_font_family'] || 'font-serif'
+                     ]">
+                         <h2 class="font-bold text-gray-900 dark:text-white" :class="contentBlocks['home_featured_font_size'] || 'text-3xl md:text-4xl'">
+                             {{ contentBlocks['home_featured_title'] || 'Latest Packages' }}
+                         </h2>
+                         <p class="text-gray-600 mt-2" :class="contentBlocks['home_featured_font_size_sub'] || 'text-lg'">
+                             {{ contentBlocks['home_featured_subtitle'] || 'Check out our most recent additions.' }}
+                         </p>
+                     </div>
+                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                         <ServiceCard v-for="service in featuredServices" :key="service.id" :service="service" />
+                     </div>
+                 </div>
+             </div>
+        </div>
 
         <!-- Featured Section -->
         <div class="py-20 bg-secondary-50 dark:bg-black overflow-hidden relative transition-colors duration-300">
              <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <div class="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
-                    <div>
-                         <!-- ... (Title/Text unchanged) ... -->
+                    <div class="mb-12 lg:mb-0" :class="[contentBlocks['home_explore_align'] || 'text-left']">
+                        <span class="text-primary-600 dark:text-primary-400 font-bold uppercase tracking-wider text-sm mb-2 block">Unforgettable Experiences</span>
+                        <h2 class="font-bold text-gray-900 dark:text-white mb-6" :class="[contentBlocks['home_explore_font_family'] || 'font-serif', contentBlocks['home_explore_title_size'] || 'text-4xl']">
+                            {{ (contentBlocks && contentBlocks['home_explore_title']) ? contentBlocks['home_explore_title'] : 'Explore Ancient Ruins' }}
+                        </h2>
+                        <p class="text-gray-600 dark:text-gray-300 mb-8 leading-relaxed" :class="[contentBlocks['home_explore_text_size'] || 'text-lg']">
+                            {{ (contentBlocks && contentBlocks['home_explore_text']) ? contentBlocks['home_explore_text'] : 'Immerse yourself in the history of the Mayan civilization. Visit Chichen Itza, Tulum, and Coba with our expert guides. We offer private and small group tours to ensure a personalized experience.' }}
+                        </p>
+                        <ul class="space-y-4 mb-8">
+                             <li class="flex items-center text-gray-700 dark:text-gray-200">
+                                <span class="bg-secondary-100 text-secondary-600 rounded-full p-1 mr-3"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></span>
+                                Skip-the-line access
+                            </li>
+                             <li class="flex items-center text-gray-700 dark:text-gray-200">
+                                <span class="bg-secondary-100 text-secondary-600 rounded-full p-1 mr-3"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></span>
+                                Certified bilingual guides
+                            </li>
+                             <li class="flex items-center text-gray-700 dark:text-gray-200">
+                                <span class="bg-secondary-100 text-secondary-600 rounded-full p-1 mr-3"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></span>
+                                Refreshments included
+                            </li>
+                        </ul>
                         <Link href="/services" class="text-cyan-600 dark:text-cyan-400 font-bold hover:text-cyan-700 dark:hover:text-cyan-300 inline-flex items-center transition-colors duration-300">
                             View All Tours <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
                         </Link>
@@ -87,11 +171,11 @@ const safeJsonParse = (str) => {
                     <!-- Text (Second on Mobile, Right on Desktop) -->
                     <!-- ... -->
                     <!-- Text (Second on Mobile, Right on Desktop) -->
-                    <div class="order-1 lg:order-2">
-                        <h2 class="text-4xl font-serif font-bold text-gray-900 dark:text-white mb-6">
+                    <div class="order-1 lg:order-2" :class="[contentBlocks['home_fleet_align'] || 'text-left']">
+                        <h2 class="font-bold text-gray-900 dark:text-white mb-6" :class="[contentBlocks['home_fleet_font_family'] || 'font-serif', contentBlocks['home_fleet_title_size'] || 'text-4xl']">
                             {{ (contentBlocks && contentBlocks['home_fleet_title']) ? contentBlocks['home_fleet_title'] : 'Travel in Luxury' }}
                         </h2>
-                        <p class="text-lg text-gray-600 dark:text-gray-300 mb-8">
+                        <p class="text-gray-600 dark:text-gray-300 mb-8" :class="[contentBlocks['home_fleet_text_size'] || 'text-lg']">
                             {{ (contentBlocks && contentBlocks['home_fleet_text']) ? contentBlocks['home_fleet_text'] : 'Our fleet consists of modern, air-conditioned vehicles including private vans and luxury SUVs. Enjoy complimentary water and a smooth ride to your destination.' }}
                         </p>
                          <ul class="space-y-4 mb-8">

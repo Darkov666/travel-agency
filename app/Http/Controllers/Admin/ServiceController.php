@@ -10,32 +10,61 @@ use Illuminate\Support\Str;
 
 class ServiceController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $query = Service::whereNotIn('type', ['merchandise', 'package'])
+            ->orderBy('created_at', 'desc');
+
+        if ($request->has('provider_id') && $request->provider_id !== 'all') {
+            $query->where('provider_id', $request->provider_id);
+        }
+
         return Inertia::render('Admin/Services/Index', [
-            'services' => Service::whereNotIn('type', ['merchandise', 'package'])
-                ->orderBy('created_at', 'desc')
-                ->paginate(10),
+            'services' => $query->paginate(10)->withQueryString(),
+            'providers' => \App\Models\Provider::select('id', 'name')->get(),
+            'filters' => $request->only(['provider_id']),
         ]);
     }
 
     public function create()
     {
-        return Inertia::render('Admin/Services/Create');
+        return Inertia::render('Admin/Services/Create', [
+            'providers' => \App\Models\Provider::select('id', 'name')->get(),
+            'categories' => \App\Models\Category::where('is_active', true)->get(),
+        ]);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'type' => 'required|string', // Allow any type for now or restricted set
+            'type' => 'required|string',
             'description' => 'nullable|string',
             'net_price' => 'required|numeric|min:0',
             'commission' => 'required|numeric|min:0',
             'commission_type' => 'required|in:fixed,percentage',
             'price' => 'required|numeric|min:0',
             'is_active' => 'boolean',
+            'provider_id' => 'nullable|exists:providers,id',
+            'category_id' => 'nullable|exists:categories,id',
+            'new_category_name' => 'nullable|string|max:255',
+            'content' => 'nullable|string',
+            'gallery' => 'nullable|array',
         ]);
+
+        // Handle new category creation
+        if (!empty($request->new_category_name)) {
+            $newCategory = \App\Models\Category::firstOrCreate(
+                ['name' => $request->new_category_name],
+                [
+                    'slug' => Str::slug($request->new_category_name),
+                    'organization_id' => auth()->user()->organization_id ?? 1,
+                    'is_active' => true,
+                    'type' => 'service'
+                ]
+            );
+            $validated['category_id'] = $newCategory->id;
+        }
 
         $validated['slug'] = Str::slug($validated['title']);
         $validated['currency'] = 'MXN';
@@ -49,7 +78,9 @@ class ServiceController extends Controller
     public function edit(Service $service)
     {
         return Inertia::render('Admin/Services/Edit', [
-            'service' => $service
+            'service' => $service,
+            'providers' => \App\Models\Provider::select('id', 'name')->get(),
+            'categories' => \App\Models\Category::where('is_active', true)->get(),
         ]);
     }
 
@@ -64,7 +95,26 @@ class ServiceController extends Controller
             'commission_type' => 'required|in:fixed,percentage',
             'price' => 'required|numeric|min:0',
             'is_active' => 'boolean',
+            'provider_id' => 'nullable|exists:providers,id',
+            'category_id' => 'nullable|exists:categories,id',
+            'new_category_name' => 'nullable|string|max:255',
+            'content' => 'nullable|string',
+            'gallery' => 'nullable|array',
         ]);
+
+        // Handle new category creation
+        if (!empty($request->new_category_name)) {
+            $newCategory = \App\Models\Category::firstOrCreate(
+                ['name' => $request->new_category_name],
+                [
+                    'slug' => Str::slug($request->new_category_name),
+                    'organization_id' => auth()->user()->organization_id ?? 1,
+                    'is_active' => true,
+                    'type' => 'service'
+                ]
+            );
+            $validated['category_id'] = $newCategory->id;
+        }
 
         $service->update($validated);
 

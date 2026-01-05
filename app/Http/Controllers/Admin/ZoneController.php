@@ -12,7 +12,8 @@ class ZoneController extends Controller
     public function index()
     {
         return Inertia::render('Admin/Zones', [
-            'zones' => Zone::all(),
+            'zones' => Zone::with('provider')->get(),
+            'providers' => \App\Models\Provider::select('id', 'name')->get(),
         ]);
     }
 
@@ -24,6 +25,8 @@ class ZoneController extends Controller
             'transfer_time_minutes' => 'required|integer|min:0',
             'color' => 'required|string|max:7',
             'coordinates' => 'nullable', // Allow string or JSON
+            'provider_id' => 'nullable|exists:providers,id',
+            'service_type' => 'nullable|string|in:transfer,tour,all',
         ]);
 
         // If coordinates is an array, Laravel's array cast will handle serialization automatically.
@@ -51,6 +54,8 @@ class ZoneController extends Controller
             'transfer_time_minutes' => 'required|integer|min:0',
             'color' => 'required|string|max:7',
             'coordinates' => 'nullable',
+            'provider_id' => 'nullable|exists:providers,id',
+            'service_type' => 'nullable|string|in:transfer,tour,all',
         ]);
 
         if (isset($validated['coordinates']) && is_string($validated['coordinates'])) {

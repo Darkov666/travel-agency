@@ -22,7 +22,7 @@ Route::get('/', function () {
     $contentBlocks = \App\Models\ContentBlock::where('group', 'home')->get()->pluck('value', 'key');
 
     return Inertia::render('Welcome', [
-        'featuredServices' => Service::where('is_active', true)->take(3)->get(),
+        'featuredServices' => Service::where('is_active', true)->whereNotIn('type', ['transfer'])->latest()->take(3)->get(),
         'latestPosts' => BlogPost::where('is_published', true)->latest('published_at')->take(3)->get(),
         'latestReviews' => \App\Models\Review::where('is_approved', true)->latest()->take(5)->get(),
         'zones' => \App\Models\Zone::all(['name', 'coordinates']), // Pass coordinates for geofencing
@@ -194,7 +194,19 @@ Route::prefix('admin')->group(function () {
         Route::resource('/products', \App\Http\Controllers\Admin\ProductController::class)->names('admin.products');
 
         // Service Management
-        Route::resource('/items', \App\Http\Controllers\Admin\ServiceController::class)->names('admin.services');
+        Route::resource('/services', \App\Http\Controllers\Admin\ServiceController::class)->names('admin.services');
+
+        // Unified Feedback Dashboard
+        Route::get('/feedback-center', [\App\Http\Controllers\Admin\FeedbackController::class, 'index'])->name('admin.feedback.index');
+
+        // Website Feedback Actions
+        Route::post('/feedback/website/{feedback}/reviewed', [\App\Http\Controllers\Admin\FeedbackController::class, 'markReviewed'])->name('admin.feedback.website.reviewed');
+        Route::delete('/feedback/website/{feedback}', [\App\Http\Controllers\Admin\FeedbackController::class, 'destroyWebsiteFeedback'])->name('admin.feedback.website.destroy');
+
+        // Service Review Actions (Aliased to FeedbackController methods)
+        Route::post('/feedback/reviews/{review}/approve', [\App\Http\Controllers\Admin\FeedbackController::class, 'approveReview'])->name('admin.feedback.reviews.approve');
+        Route::post('/feedback/reviews/{review}/reject', [\App\Http\Controllers\Admin\FeedbackController::class, 'rejectReview'])->name('admin.feedback.reviews.reject');
+        Route::delete('/feedback/reviews/{review}', [\App\Http\Controllers\Admin\FeedbackController::class, 'destroyReview'])->name('admin.feedback.reviews.destroy');
     });
 
     // Public Comments
@@ -254,6 +266,9 @@ Route::get('/partners', function () {
     return Inertia::render('Partners');
 })->name('partners');
 
+Route::get('/partner/register', [App\Http\Controllers\OnboardingController::class, 'showRegistrationForm'])->name('partner.register');
+Route::post('/partner/register', [App\Http\Controllers\OnboardingController::class, 'storeOrganization'])->name('partner.register.store');
+
 Route::get('/partner/payment/{organization}', [App\Http\Controllers\OnboardingController::class, 'showPayment'])->name('partner.payment.show');
 Route::post('/partner/payment/{organization}/stripe', [App\Http\Controllers\OnboardingController::class, 'initiateStripePayment'])->name('partner.payment.stripe');
 Route::get('/partner/payment/{organization}/success', [App\Http\Controllers\OnboardingController::class, 'handlePaymentSuccess'])->name('partner.payment.success');
@@ -263,4 +278,13 @@ Route::get('/partner/setup/{organization}', [App\Http\Controllers\OnboardingCont
 // Review Routes
 Route::get('/review/{token}', [App\Http\Controllers\ReviewController::class, 'show'])->name('reviews.show');
 Route::post('/review/{token}', [App\Http\Controllers\ReviewController::class, 'store'])->name('reviews.store');
+
+// Feedback Routes (New)
+Route::get('/feedback/website/{token}', [\App\Http\Controllers\WebsiteFeedbackController::class, 'show'])->name('feedback.website.show');
+Route::post('/feedback/website/{token}', [\App\Http\Controllers\WebsiteFeedbackController::class, 'store'])->name('feedback.website.store');
+
+Route::get('/feedback/service/{token}', [\App\Http\Controllers\ServiceFeedbackController::class, 'show'])->name('feedback.service.show');
+Route::post('/feedback/service/{token}', [\App\Http\Controllers\ServiceFeedbackController::class, 'store'])->name('feedback.service.store');
+
+// End Routes
 

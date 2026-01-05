@@ -23,6 +23,9 @@ class Service extends Model
         'commission',
         'commission_type',
         'currency',
+        'content',
+        'gallery',
+        'category_id',
     ];
 
     protected $casts = [
@@ -32,6 +35,7 @@ class Service extends Model
         'net_price' => 'decimal:2',
         'commission' => 'decimal:2',
         'features' => 'array',
+        'gallery' => 'array',
     ];
 
     protected $appends = ['requires_scheduling', 'downloadable'];
@@ -46,5 +50,10 @@ class Service extends Model
     {
         // Types that are digital products
         return in_array($this->type, ['ebook', 'manual', 'video', 'audio']);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 }

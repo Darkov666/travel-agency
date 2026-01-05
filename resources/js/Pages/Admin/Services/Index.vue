@@ -1,10 +1,21 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import { Link, router } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 
 const props = defineProps({
     services: Object,
+    providers: Array,
+    filters: Object,
+});
+
+const providerId = ref(props.filters?.provider_id || 'all');
+
+watch(providerId, (value) => {
+    router.get(route('admin.services.index'), { provider_id: value }, {
+        preserveState: true,
+        replace: true,
+    });
 });
 
 const deleteService = (id) => {
@@ -21,9 +32,15 @@ const deleteService = (id) => {
                 <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                     Services
                 </h2>
-                <Link :href="route('admin.services.create')" class="px-4 py-2 bg-primary-600 text-white rounded-md text-sm font-medium hover:bg-primary-700">
-                    Create Service
-                </Link>
+                <div class="flex items-center space-x-4">
+                    <select v-model="providerId" class="text-sm rounded border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                        <option value="all">All Providers</option>
+                        <option v-for="provider in providers" :key="provider.id" :value="provider.id">{{ provider.name }}</option>
+                    </select>
+                    <Link :href="route('admin.services.create')" class="px-4 py-2 bg-primary-600 text-white rounded-md text-sm font-medium hover:bg-primary-700">
+                        Create Service
+                    </Link>
+                </div>
             </div>
         </template>
 

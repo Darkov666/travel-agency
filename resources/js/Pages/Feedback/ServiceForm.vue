@@ -1,0 +1,74 @@
+<script setup>
+import { Head, useForm } from '@inertiajs/vue3';
+import MainLayout from '@/Layouts/MainLayout.vue';
+
+const props = defineProps({
+    token: String,
+    reservation: Object,
+});
+
+const form = useForm({
+    rating: null,
+    content: '',
+    reviewer_name: '',
+});
+
+const submit = () => {
+    form.post(route('feedback.service.store', props.token));
+};
+</script>
+
+<template>
+    <Head title="Rate Your Trip" />
+    <MainLayout>
+        <div class="py-12">
+            <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow sm:rounded-lg p-6">
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2 text-center">
+                        How was your trip?
+                    </h2>
+                    <p class="text-gray-500 text-center mb-6">
+                        Reservation: #{{ reservation.reservation_number }}<br>
+                        Service: {{ reservation.service?.name }}
+                    </p>
+                    
+                    <form @submit.prevent="submit" class="space-y-6">
+                         <!-- Rating -->
+                        <div class="flex flex-col items-center">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rate your driver & service</label>
+                            <div class="flex space-x-2">
+                                <label v-for="star in 5" :key="star" class="cursor-pointer">
+                                    <input type="radio" v-model="form.rating" :value="star" class="hidden">
+                                     <svg class="w-10 h-10 transition-colors duration-200" :class="form.rating >= star ? 'text-yellow-400' : 'text-gray-300 hover:text-yellow-200'" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                </label>
+                            </div>
+                             <div v-if="form.errors.rating" class="text-red-500 text-xs mt-1">{{ form.errors.rating }}</div>
+                        </div>
+
+                        <!-- Reviewer Name -->
+                        <div>
+                            <label for="reviewer_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Your Name (for display)</label>
+                            <input v-model="form.reviewer_name" type="text" id="reviewer_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                             <div v-if="form.errors.reviewer_name" class="text-red-500 text-xs mt-1">{{ form.errors.reviewer_name }}</div>
+                        </div>
+
+                        <!-- Content -->
+                        <div>
+                            <label for="content" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Your Review</label>
+                            <textarea v-model="form.content" id="content" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Share your experience..."></textarea>
+                             <div v-if="form.errors.content" class="text-red-500 text-xs mt-1">{{ form.errors.content }}</div>
+                        </div>
+
+                        <div class="flex justify-end">
+                            <button type="submit" :disabled="form.processing" class="bg-cyan-600 text-white px-6 py-2 rounded-md hover:bg-cyan-700 transition font-medium disabled:opacity-50">
+                                Submit Review
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </MainLayout>
+</template>

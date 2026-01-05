@@ -20,6 +20,8 @@ class Zone extends Model
         'transfer_time_minutes',
         'priority',
         'color',
+        'provider_id',
+        'service_type',
     ];
 
     protected $casts = [
@@ -30,5 +32,10 @@ class Zone extends Model
     public function providerServices()
     {
         return $this->hasMany(ProviderService::class);
+    }
+
+    public function provider()
+    {
+        return $this->belongsTo(Provider::class);
     }
 }

@@ -1,10 +1,25 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import { Head, useForm, router } from '@inertiajs/vue3';
-import { onMounted, ref, watch, toRaw, markRaw } from 'vue';
+import { onMounted, ref, watch, toRaw, markRaw, computed } from 'vue';
 
 const props = defineProps({
-    zones: Array
+    zones: Array,
+    providers: Array
+});
+
+const filterProvider = ref('all');
+const filterType = ref('all');
+
+const filteredZones = computed(() => {
+    return props.zones.filter(zone => {
+        const matchesProvider = filterProvider.value === 'all' || 
+            (filterProvider.value === 'admin' ? !zone.provider_id : zone.provider_id == filterProvider.value);
+        
+        const matchesType = filterType.value === 'all' || zone.service_type === filterType.value;
+
+        return matchesProvider && matchesType;
+    });
 });
 
 const apiKeyConfigured = ref(!!import.meta.env.VITE_GOOGLE_MAPS_API_KEY);
@@ -23,7 +38,9 @@ const form = useForm({
     priority: 0,
     transfer_time_minutes: 60,
     color: '#3b82f6',
-    coordinates: null
+    coordinates: null,
+    provider_id: null,
+    service_type: 'transfer'
 });
 
 // Load Google Maps with Drawing Library
@@ -91,7 +108,9 @@ const loadZonesOnMap = () => {
     polygons.forEach(p => p.setMap(null));
     polygons = [];
 
-    props.zones.forEach(zone => {
+    polygons = [];
+
+    filteredZones.value.forEach(zone => {
         if (!zone.coordinates) return;
         
         // zone.coordinates is now an Array (Model Cast)
@@ -155,6 +174,8 @@ const editZone = (zone, polygon) => {
     form.transfer_time_minutes = zone.transfer_time_minutes || 60;
     form.color = zone.color;
     form.coordinates = zone.coordinates; // Keep existing unless edited
+    form.provider_id = zone.provider_id;
+    form.service_type = zone.service_type || 'transfer';
     
     // Enable editing on map
     polygons.forEach(p => p.setEditable(false)); // Disable others
@@ -213,7 +234,7 @@ const closeModal = (reload = false) => {
 };
 
 // Watch for zones prop change to refresh map
-watch(() => props.zones, () => {
+watch(() => [props.zones, filterProvider.value, filterType.value], () => {
     loadZonesOnMap();
 }, { deep: true });
 
@@ -244,6 +265,21 @@ onMounted(() => {
             </div>
             <div ref="mapContainer" class="w-full h-full"></div>
 
+            <!-- Filters -->
+            <div class="absolute top-4 left-4 bg-white dark:bg-gray-800 p-3 rounded shadow-md z-10 flex flex-col space-y-2 w-64">
+                <h4 class="font-bold text-sm text-gray-700 dark:text-gray-300">Filters</h4>
+                <select v-model="filterProvider" class="text-sm rounded border-gray-300 dark:bg-gray-700 dark:text-white">
+                    <option value="all">All Providers</option>
+                    <option value="admin">Global / Admin</option>
+                    <option v-for="p in providers" :key="p.id" :value="p.id">{{ p.name }}</option>
+                </select>
+                <select v-model="filterType" class="text-sm rounded border-gray-300 dark:bg-gray-700 dark:text-white">
+                    <option value="all">All Types</option>
+                    <option value="transfer">Transfers (Fleet)</option>
+                    <option value="tour">Tours / Products</option>
+                </select>
+            </div>
+
             <!-- Edit Modal -->
             <div v-if="showModal" class="absolute top-4 right-4 w-80 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-xl z-10">
                 <h3 class="font-bold text-lg mb-4 text-gray-800 dark:text-white">
@@ -254,6 +290,24 @@ onMounted(() => {
                     <div class="mb-4">
                         <label class="block text-sm font-bold mb-1 text-gray-700 dark:text-gray-300">Name</label>
                         <input v-model="form.name" type="text" class="w-full rounded border-gray-300 dark:bg-gray-700 dark:text-white" required>
+                    </div>
+
+                    <div class="mb-4 grid grid-cols-2 gap-2">
+                        <div>
+                             <label class="block text-xs font-bold mb-1 text-gray-700 dark:text-gray-300">Owner (Provider)</label>
+                             <select v-model="form.provider_id" class="w-full text-sm rounded border-gray-300 dark:bg-gray-700 dark:text-white">
+                                <option :value="null">Global / Admin</option>
+                                <option v-for="p in providers" :key="p.id" :value="p.id">{{ p.name }}</option>
+                            </select>
+                        </div>
+                         <div>
+                             <label class="block text-xs font-bold mb-1 text-gray-700 dark:text-gray-300">Type</label>
+                             <select v-model="form.service_type" class="w-full text-sm rounded border-gray-300 dark:bg-gray-700 dark:text-white">
+                                <option value="transfer">Transfer</option>
+                                <option value="tour">Tour/Product</option>
+                                <option value="all">All</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="mb-4">
