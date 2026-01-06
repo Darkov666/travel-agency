@@ -9,8 +9,6 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
@@ -112,5 +110,20 @@ class User extends Authenticatable
     public function isProvider()
     {
         return str_contains($this->role, 'provider') || $this->provider_id !== null;
+    }
+
+    public function isDriver()
+    {
+        return $this->role === 'driver';
+    }
+
+    public function scopeDrivers($query)
+    {
+        return $query->where('role', 'driver');
+    }
+
+    public function serviceOrders()
+    {
+        return $this->hasMany(ServiceOrder::class, 'driver_id');
     }
 }

@@ -43,5 +43,6 @@
     "admin_nav.providers": "Providers",
     "admin_nav.service_ops": "Service Ops",
     "admin_nav.feedback": "Feedback & Reviews",
-    "admin_nav.comments": "Comments"
+    "admin_nav.comments": "Comments",
+    "admin_nav.my_zones": "My Zones"
 }

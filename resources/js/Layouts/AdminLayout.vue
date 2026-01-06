@@ -20,6 +20,8 @@ const navigation = [
     { name: 'Service Ops', label: 'admin_nav.service_ops', href: route('admin.reservations.index'), routeName: 'admin.reservations.*', icon: 'fas fa-tasks', roles: ['root', 'admin', 'supervisor'] },
     { name: 'Feedback & Reviews', label: 'admin_nav.feedback', href: route('admin.feedback.index'), routeName: 'admin.feedback.*', icon: 'fas fa-comments', roles: ['root', 'admin'] },
     { name: 'Comments', label: 'admin_nav.comments', href: route('admin.comments.index'), routeName: 'admin.comments.*', icon: 'fas fa-comment-dots', roles: ['root', 'admin'] },
+    // Provider Links
+    { name: 'My Zones', label: 'admin_nav.my_zones', href: route('provider.zones.index'), routeName: 'provider.zones.*', icon: 'fas fa-map-marked-alt', roles: ['provider', 'vendor'] },
 ];
 
 const visibleNavigation = computed(() => {

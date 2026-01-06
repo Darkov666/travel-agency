@@ -105,7 +105,20 @@ Route::post('/comments/{comment}/like', [BlogController::class, 'likeComment'])-
 Route::middleware(['auth', 'verified'])->prefix('provider')->name('provider.')->group(function () {
     Route::get('/services', [\App\Http\Controllers\Provider\ProviderPortalController::class, 'index'])->name('services.index');
     Route::get('/services/{providerService}/edit', [\App\Http\Controllers\Provider\ProviderPortalController::class, 'edit'])->name('services.edit');
+    Route::get('/services/{providerService}/edit', [\App\Http\Controllers\Provider\ProviderPortalController::class, 'edit'])->name('services.edit');
     Route::put('/services/{providerService}', [\App\Http\Controllers\Provider\ProviderPortalController::class, 'update'])->name('services.update');
+
+    // Provider Zone Management
+    Route::resource('/zones', \App\Http\Controllers\Provider\ZoneController::class)->names('provider.zones');
+});
+
+// Driver Portal
+Route::middleware(['auth', 'verified'])->prefix('driver')->name('driver.')->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\Driver\DriverPortalController::class, 'dashboard'])->name('dashboard');
+    Route::get('/order/{order}', [\App\Http\Controllers\Driver\DriverPortalController::class, 'show'])->name('order.show');
+    Route::post('/order/{order}/accept', [\App\Http\Controllers\Driver\DriverPortalController::class, 'accept'])->name('order.accept');
+    Route::post('/order/{order}/reject', [\App\Http\Controllers\Driver\DriverPortalController::class, 'reject'])->name('order.reject');
+    Route::post('/order/{order}/status', [\App\Http\Controllers\Driver\DriverPortalController::class, 'updateStatus'])->name('order.status');
 });
 
 // Admin Routes
@@ -207,6 +220,12 @@ Route::prefix('admin')->group(function () {
         Route::post('/feedback/reviews/{review}/approve', [\App\Http\Controllers\Admin\FeedbackController::class, 'approveReview'])->name('admin.feedback.reviews.approve');
         Route::post('/feedback/reviews/{review}/reject', [\App\Http\Controllers\Admin\FeedbackController::class, 'rejectReview'])->name('admin.feedback.reviews.reject');
         Route::delete('/feedback/reviews/{review}', [\App\Http\Controllers\Admin\FeedbackController::class, 'destroyReview'])->name('admin.feedback.reviews.destroy');
+
+        // Dispatch & Operations
+        Route::get('/dispatch', [\App\Http\Controllers\Admin\DispatchController::class, 'index'])->name('admin.dispatch.index');
+        Route::post('/dispatch/{order}/assign', [\App\Http\Controllers\Admin\DispatchController::class, 'assign'])->name('admin.dispatch.assign');
+        Route::post('/dispatch/{order}/unassign', [\App\Http\Controllers\Admin\DispatchController::class, 'unassign'])->name('admin.dispatch.unassign');
+        Route::get('/map', [\App\Http\Controllers\Admin\DispatchController::class, 'map'])->name('admin.map');
     });
 
     // Public Comments
@@ -255,6 +274,8 @@ Route::get('/debug-data', function () {
 });
 
 Route::get('/search', [App\Http\Controllers\SearchController::class, 'index'])->name('search');
+
+Route::get('/track/{serviceOrder}', [App\Http\Controllers\TrackingController::class, 'show'])->name('tracking.show');
 
 Route::get('/contact', [App\Http\Controllers\ContactController::class, 'index'])->name('contact.index');
 Route::post('/contact', [App\Http\Controllers\ContactController::class, 'store'])->name('contact.store');

@@ -65,4 +65,9 @@ class ReservationItem extends Model
     {
         return $this->belongsTo(Provider::class, 'assigned_provider_id');
     }
+
+    public function serviceOrder()
+    {
+        return $this->hasOne(ServiceOrder::class);
+    }
 }
