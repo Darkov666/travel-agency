@@ -7,21 +7,21 @@ const showingSidebar = ref(false);
 const showingNotifications = ref(false);
 
 const navigation = [
-    { name: 'Dashboard', label: 'admin_nav.dashboard', href: route('admin.dashboard'), routeName: 'admin.dashboard', icon: 'fas fa-home', roles: ['root', 'admin', 'supervisor', 'operator'] },
-    { name: 'Content', label: 'admin_nav.content', href: route('admin.content.index'), routeName: 'admin.content.*', icon: 'fas fa-pen-fancy', roles: ['root', 'admin'] },
-    { name: 'Blog', label: 'admin_nav.blog', href: route('admin.blog.index'), routeName: 'admin.blog.*', icon: 'fas fa-newspaper', roles: ['root', 'admin'] },
-    { name: 'Blog Categories', label: 'admin_nav.blog_categories', href: route('admin.blog-topics.index'), routeName: 'admin.blog-topics.*', icon: 'fas fa-tags', roles: ['root', 'admin'] },
-    { name: 'Organizations', label: 'admin_nav.organizations', href: route('admin.organizations.index'), routeName: 'admin.organizations.*', icon: 'fas fa-sitemap', roles: ['root'] },
-    { name: 'Approvals', label: 'admin_nav.approvals', href: route('admin.change-requests.index'), routeName: 'admin.change-requests.*', icon: 'fas fa-clipboard-check', roles: ['root', 'admin'] },
-    { name: 'Activity Log', label: 'admin_nav.activity_log', href: route('admin.activity-logs.index'), routeName: 'admin.activity-logs.*', icon: 'fas fa-history', roles: ['root', 'admin'] },
-    { name: 'Zones Editor', label: 'admin_nav.zones', href: route('admin.zones.index'), routeName: 'admin.zones.*', icon: 'fas fa-map-marked-alt', roles: ['root', 'admin'] },
-    { name: 'Service Catalog', label: 'admin_nav.services', href: route('admin.services.index'), routeName: 'admin.services.*', icon: 'fas fa-umbrella-beach', roles: ['root', 'admin'] },
-    { name: 'Providers', label: 'admin_nav.providers', href: route('admin.providers.index'), routeName: 'admin.providers.*', icon: 'fas fa-building', roles: ['root', 'admin'] },
-    { name: 'Service Ops', label: 'admin_nav.service_ops', href: route('admin.reservations.index'), routeName: 'admin.reservations.*', icon: 'fas fa-tasks', roles: ['root', 'admin', 'supervisor'] },
-    { name: 'Feedback & Reviews', label: 'admin_nav.feedback', href: route('admin.feedback.index'), routeName: 'admin.feedback.*', icon: 'fas fa-comments', roles: ['root', 'admin'] },
-    { name: 'Comments', label: 'admin_nav.comments', href: route('admin.comments.index'), routeName: 'admin.comments.*', icon: 'fas fa-comment-dots', roles: ['root', 'admin'] },
+    { name: 'Dashboard', label: 'admin_nav.dashboard', routeTarget: 'admin.dashboard', routeName: 'admin.dashboard', icon: 'fas fa-home', roles: ['root', 'admin', 'supervisor', 'operator'] },
+    { name: 'Content', label: 'admin_nav.content', routeTarget: 'admin.content.index', routeName: 'admin.content.*', icon: 'fas fa-pen-fancy', roles: ['root', 'admin'] },
+    { name: 'Blog', label: 'admin_nav.blog', routeTarget: 'admin.blog.index', routeName: 'admin.blog.*', icon: 'fas fa-newspaper', roles: ['root', 'admin'] },
+    { name: 'Blog Categories', label: 'admin_nav.blog_categories', routeTarget: 'admin.blog-topics.index', routeName: 'admin.blog-topics.*', icon: 'fas fa-tags', roles: ['root', 'admin'] },
+    { name: 'Organizations', label: 'admin_nav.organizations', routeTarget: 'admin.organizations.index', routeName: 'admin.organizations.*', icon: 'fas fa-sitemap', roles: ['root'] },
+    { name: 'Approvals', label: 'admin_nav.approvals', routeTarget: 'admin.change-requests.index', routeName: 'admin.change-requests.*', icon: 'fas fa-clipboard-check', roles: ['root', 'admin'] },
+    { name: 'Activity Log', label: 'admin_nav.activity_log', routeTarget: 'admin.activity-logs.index', routeName: 'admin.activity-logs.*', icon: 'fas fa-history', roles: ['root', 'admin'] },
+    { name: 'Zones Editor', label: 'admin_nav.zones', routeTarget: 'admin.zones.index', routeName: 'admin.zones.*', icon: 'fas fa-map-marked-alt', roles: ['root', 'admin'] },
+    { name: 'Service Catalog', label: 'admin_nav.services', routeTarget: 'admin.services.index', routeName: 'admin.services.*', icon: 'fas fa-umbrella-beach', roles: ['root', 'admin'] },
+    { name: 'Providers', label: 'admin_nav.providers', routeTarget: 'admin.providers.index', routeName: 'admin.providers.*', icon: 'fas fa-building', roles: ['root', 'admin'] },
+    { name: 'Service Ops', label: 'admin_nav.service_ops', routeTarget: 'admin.reservations.index', routeName: 'admin.reservations.*', icon: 'fas fa-tasks', roles: ['root', 'admin', 'supervisor'] },
+    { name: 'Feedback & Reviews', label: 'admin_nav.feedback', routeTarget: 'admin.feedback.index', routeName: 'admin.feedback.*', icon: 'fas fa-comments', roles: ['root', 'admin'] },
+    { name: 'Comments', label: 'admin_nav.comments', routeTarget: 'admin.comments.index', routeName: 'admin.comments.*', icon: 'fas fa-comment-dots', roles: ['root', 'admin'] },
     // Provider Links
-    { name: 'My Zones', label: 'admin_nav.my_zones', href: route('provider.zones.index'), routeName: 'provider.zones.*', icon: 'fas fa-map-marked-alt', roles: ['provider', 'vendor'] },
+    { name: 'My Zones', label: 'admin_nav.my_zones', routeTarget: 'provider.zones.index', routeName: 'provider.zones.*', icon: 'fas fa-map-marked-alt', roles: ['provider', 'vendor'] },
 ];
 
 const visibleNavigation = computed(() => {
@@ -46,7 +46,7 @@ const logout = () => {
             </div>
 
             <nav class="mt-5 px-2 space-y-1">
-                <Link v-for="item in visibleNavigation" :key="item.name" :href="item.href" :class="[route().current(item.routeName) ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'group flex items-center px-2 py-2 text-base font-medium rounded-md']">
+                <Link v-for="item in visibleNavigation" :key="item.name" :href="route(item.routeTarget)" :class="[route().current(item.routeName) ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'group flex items-center px-2 py-2 text-base font-medium rounded-md']">
                     <!-- Icon placeholder if FontAwesome not loaded, or use Heroicons -->
                     <span class="mr-3 text-lg">
                          <!-- Simple SVG Icons as fallback -->
