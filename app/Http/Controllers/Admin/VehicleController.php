@@ -10,6 +10,8 @@ class VehicleController extends Controller
 {
     public function store(Request $request)
     {
+        \Illuminate\Support\Facades\Log::info('Vehicle Store Request:', $request->all());
+
         $validated = $request->validate([
             'provider_id' => 'required|exists:providers,id',
             'model_name' => 'required|string',

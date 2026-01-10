@@ -14,8 +14,17 @@ class BlogController extends Controller
 {
     public function index()
     {
+        $query = BlogPost::with(['author', 'topic'])->latest();
+
+        $user = Auth::user();
+        if ($user->organization_id) {
+            $query->whereHas('author', function ($q) use ($user) {
+                $q->where('organization_id', $user->organization_id);
+            });
+        }
+
         return Inertia::render('Admin/Blog/Index', [
-            'posts' => BlogPost::with(['author', 'topic'])->latest()->paginate(10),
+            'posts' => $query->paginate(10),
         ]);
     }
 

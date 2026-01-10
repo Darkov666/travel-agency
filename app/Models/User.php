@@ -21,6 +21,7 @@ class User extends Authenticatable
         'email',
         'password',
         'organization_id',
+        'provider_id', // Added
         'role',
         'phone',
         'operator_status',
@@ -125,5 +126,10 @@ class User extends Authenticatable
     public function serviceOrders()
     {
         return $this->hasMany(ServiceOrder::class, 'driver_id');
+    }
+
+    public function organization()
+    {
+        return $this->belongsTo(Organization::class);
     }
 }

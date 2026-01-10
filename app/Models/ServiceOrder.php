@@ -14,6 +14,7 @@ class ServiceOrder extends Model
         'driver_id',
         'vehicle_id',
         'folio',
+        'item_reference', // Copied from ReservationItem (Service Control Ref)
         'status',
         'current_lat',
         'current_lng',

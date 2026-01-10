@@ -35,6 +35,114 @@ class ReservationController extends Controller
         ]);
     }
 
+    public function create()
+    {
+        $user = \Illuminate\Support\Facades\Auth::user();
+        $orgId = $user->organization_id;
+
+        // Fetch services available for this org (or all if root?)
+        // Assuming we pick from ProviderServices directly?
+        // Or we pick from "Service Catalog" (Service model).
+        // Let's pick from ProviderService where provider belongs to org? 
+        // Or ProviderService where org is implicit?
+
+        // For SaaS, we want to book a service offered by the current tenant.
+        // Tenant -> Providers -> ProviderServices.
+
+        $providerServices = \App\Models\ProviderService::with(['provider', 'service', 'zone'])
+            ->when($orgId, function ($q) use ($orgId) {
+                // Providers belonging to Org OR assigned to Org
+                $q->whereHas('provider', function ($p) use ($orgId) {
+                    $p->where('organization_id', $orgId)
+                        ->orWhereHas('assignedOrganizations', function ($ass) use ($orgId) {
+                            $ass->where('organization_id', $orgId);
+                        });
+                });
+            })
+            ->get()
+            ->map(function ($ps) {
+                return [
+                    'id' => $ps->id,
+                    'name' => $ps->service_name_full, // accessor? or build string
+                    'label' => ($ps->zone ? $ps->zone->name . ' - ' : '') . ($ps->service ? $ps->service->title : $ps->name) . ' ($' . $ps->price_public . ')',
+                    'price' => $ps->price_public
+                ];
+            });
+
+        return Inertia::render('Admin/Reservations/Create', [
+            'providerServices' => $providerServices
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'client_name' => 'required|string',
+            'client_email' => 'required|email',
+            'client_phone' => 'nullable|string',
+            'provider_service_id' => 'required|exists:provider_services,id',
+            'date' => 'required|date',
+            'time' => 'required',
+            'pax' => 'required|integer|min:1',
+            'pickup_location' => 'nullable|string', // Details could be complex
+        ]);
+
+        $user = \Illuminate\Support\Facades\Auth::user();
+        $ps = \App\Models\ProviderService::with('provider', 'service', 'zone')->find($validated['provider_service_id']);
+
+        // Create Reservation Header
+        $reservation = \App\Models\Reservation::create([
+            'booking_ref' => 'MAN-' . Str::upper(Str::random(6)),
+            'user_id' => $user->id, // Admin created
+            'contact_name' => $validated['client_name'],
+            'contact_email' => $validated['client_email'],
+            'contact_phone' => $validated['client_phone'],
+            'total_amount' => $ps->price_public * 1, // Quantity 1 logic for now
+            'status' => 'confirmed', // Admin manual entry
+            'payment_status' => 'pending', // or paid?
+            'organization_id' => $user->organization_id,
+            'currency' => 'USD' // Default
+        ]);
+
+        // Create Item
+        \App\Models\ReservationItem::create([
+            'reservation_id' => $reservation->id,
+            'provider_service_id' => $ps->id,
+            'service_name' => ($ps->service ? $ps->service->title : $ps->name) ?? 'Custom Service',
+            'provider_name' => $ps->provider->name,
+            'zone_id' => $ps->zone_id,
+            'zone_name' => $ps->zone ? $ps->zone->name : 'General',
+            'quantity' => 1, // Default to 1 unit
+            'units' => 1,
+            'unit_price' => $ps->price_public,
+            'total_price' => $ps->price_public,
+            'date' => $validated['date'],
+            'time' => $validated['time'],
+            'pax' => $validated['pax'],
+            'pickup_time' => $validated['time'], // same as time?
+            'passengers_data' => ['pickup_location' => $validated['pickup_location'] ?? ''],
+            'assigned_provider_id' => $ps->provider_id, // Default to the service provider
+            'vendor_status' => 'pending', // Notify them?
+        ]);
+
+        // Send Notifications
+        try {
+            // 1. To Client
+            if ($validated['client_email']) {
+                Mail::to($validated['client_email'])->send(new \App\Mail\BookingConfirmation($reservation));
+            }
+
+            // 2. To Admin (Notification of created booking?) - Maybe skip since Admin created it.
+            // But if created by Supervisor, Admin might want to know.
+            // Mail::to($user->email)... ?? 
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Manual Reservation Email Failed: " . $e->getMessage());
+        }
+
+        return redirect()->route('admin.reservations.index')->with('success', 'Manual reservation created.');
+    }
+
     public function assignProvider(Request $request, ReservationItem $item)
     {
         $request->validate([

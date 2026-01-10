@@ -11,9 +11,28 @@ class ZoneController extends Controller
 {
     public function index()
     {
+        $user = auth()->user();
+        $query = Zone::with('provider');
+
+        if ($user->organization_id) {
+            $query->where('organization_id', $user->organization_id);
+        }
+
+        // Filter providers by Organization and Type=Transport (Zones are typically for transfers)
+        $providerQuery = \App\Models\Provider::query();
+        if ($user->organization_id) {
+            $providerQuery->where(function ($q) use ($user) {
+                $q->where('organization_id', $user->organization_id)
+                    ->orWhereHas('assignedOrganizations', function ($sub) use ($user) {
+                        $sub->where('organization_id', $user->organization_id);
+                    });
+            });
+        }
+        $providerQuery->where('provider_type', 'transport');
+
         return Inertia::render('Admin/Zones', [
-            'zones' => Zone::with('provider')->get(),
-            'providers' => \App\Models\Provider::select('id', 'name')->get(),
+            'zones' => $query->get(),
+            'providers' => $providerQuery->select('id', 'name')->get(),
         ]);
     }
 

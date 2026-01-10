@@ -21,6 +21,16 @@ const defaultHero = '/images/hero.jpg';
 const defaultVan = 'https://placehold.co/800x600/F4A460/FFFFFF/png?text=Luxury+Van';
 const defaultRuins = 'https://placehold.co/800x600/FF7F50/FFFFFF/png?text=Mayan+Ruins';
 
+import { usePage } from '@inertiajs/vue3';
+
+const page = usePage();
+
+const hasModule = (module) => {
+    if (!page.props.tenant) return true;
+    const modules = page.props.tenant.modules || ['transport', 'tours', 'shop', 'blog'];
+    return modules.includes(module);
+};
+
 const safeJsonParse = (str) => {
     try {
         return JSON.parse(str);
@@ -32,7 +42,7 @@ const safeJsonParse = (str) => {
 </script>
 
 <template>
-    <Head title="Welcome to Paradise" />
+    <Head :title="$t('nav.home') + ($page.props.tenant ? ' - ' + $page.props.tenant.commercial_name : ' - ' + $page.props.appName)" />
 
     <MainLayout>
         <!-- Hero Section -->
@@ -117,8 +127,8 @@ const safeJsonParse = (str) => {
              </div>
         </div>
 
-        <!-- Featured Section -->
-        <div class="py-20 bg-secondary-50 dark:bg-black overflow-hidden relative transition-colors duration-300">
+        <!-- Featured Section (Tours) -->
+        <div v-if="hasModule('tours')" class="py-20 bg-secondary-50 dark:bg-black overflow-hidden relative transition-colors duration-300">
              <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <div class="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
                     <div class="mb-12 lg:mb-0" :class="[contentBlocks['home_explore_align'] || 'text-left']">
@@ -190,7 +200,7 @@ const safeJsonParse = (str) => {
         </div>
 
         <!-- Blog Section -->
-        <div v-if="latestPosts && latestPosts.length > 0" class="py-20 bg-white dark:bg-gray-800">
+        <div v-if="hasModule('blog') && latestPosts && latestPosts.length > 0" class="py-20 bg-white dark:bg-gray-800">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-12">
                      <h2 class="text-3xl md:text-4xl font-serif font-bold text-gray-900 dark:text-white mb-4">Latest from our Blog</h2>
@@ -273,7 +283,7 @@ const safeJsonParse = (str) => {
         </div>
 
         <!-- Partner CTA Section -->
-        <div class="py-20 bg-gradient-to-r from-blue-900 to-indigo-900 text-white relative overflow-hidden">
+        <div v-if="!$page.props.tenant" class="py-20 bg-gradient-to-r from-blue-900 to-indigo-900 text-white relative overflow-hidden">
             <div class="absolute inset-0 bg-pattern opacity-10"></div>
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
                 <h2 class="text-3xl md:text-4xl font-serif font-bold mb-6">Own a Travel Agency?</h2>

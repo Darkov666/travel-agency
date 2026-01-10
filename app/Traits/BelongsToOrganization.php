@@ -19,7 +19,21 @@ trait BelongsToOrganization
                 // So default behavior for Root: NO SCOPE. For others: SCOPE.
 
                 if (!in_array($user->role, ['root', 'admin_ti']) && $user->organization_id) {
-                    $builder->where('organization_id', $user->organization_id);
+                    $builder->where(function ($query) use ($user, $builder) {
+                        $query->where('organization_id', $user->organization_id);
+
+                        // Check if the model has the 'assignedOrganizations' relationship method
+                        if (method_exists($builder->getModel(), 'assignedOrganizations')) {
+                            $query->orWhereHas('assignedOrganizations', function ($q) use ($user) {
+                                $q->where('organization_id', $user->organization_id);
+                            });
+                        }
+
+                        // Check if model allows global scope (null organization_id)
+                        if (property_exists($builder->getModel(), 'allowGlobalScope') && $builder->getModel()->allowGlobalScope) {
+                            $query->orWhereNull('organization_id');
+                        }
+                    });
                 }
             }
         });

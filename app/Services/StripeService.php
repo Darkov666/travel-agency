@@ -10,7 +10,11 @@ class StripeService
 
     public function __construct()
     {
-        $this->stripe = new StripeClient(config('services.stripe.secret'));
+        $apiKey = config('services.stripe.secret');
+        if (empty($apiKey)) {
+            throw new \Exception("Stripe API Key is missing. Please check your .env file (STRIPE_SECRET) and run 'php artisan config:clear'.");
+        }
+        $this->stripe = new StripeClient($apiKey);
     }
 
     /**

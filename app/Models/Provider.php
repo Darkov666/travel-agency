@@ -49,4 +49,11 @@ class Provider extends Model
     {
         return $this->hasMany(ProviderService::class);
     }
+
+    public function assignedOrganizations(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Organization::class, 'organization_provider')
+            ->withPivot('is_active', 'commission_rate')
+            ->withTimestamps();
+    }
 }

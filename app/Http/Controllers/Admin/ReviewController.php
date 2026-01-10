@@ -13,6 +13,13 @@ class ReviewController extends Controller
     {
         $query = Review::with('reservation');
 
+        $user = auth()->user();
+        if ($user->organization_id) {
+            $query->whereHas('reservation', function ($q) use ($user) {
+                $q->where('organization_id', $user->organization_id);
+            });
+        }
+
         if ($request->filled('status')) {
             if ($request->status === 'approved') {
                 $query->where('is_approved', true);

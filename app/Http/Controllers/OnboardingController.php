@@ -45,6 +45,8 @@ class OnboardingController extends Controller
             'hosting_mode' => 'required|in:subdomain,domain',
             'subdomain_slug' => 'nullable|required_if:hosting_mode,subdomain|string|alpha_dash|unique:organizations,slug',
             'custom_domain' => 'nullable|required_if:hosting_mode,domain|string|unique:organizations,custom_domain',
+            'modules' => 'required|array|min:1',
+            'modules.*' => 'in:transport,tours,baggage,groups_lodging',
         ]);
 
         // 1. PDF Validation (Constancia Fiscal Date Check)
@@ -107,7 +109,10 @@ class OnboardingController extends Controller
             'legal_docs' => $paths,
             'hosting_mode' => $validated['hosting_mode'],
             'custom_domain' => $validated['custom_domain'] ?? null,
-            'subscription_status' => 'suspended', // Suspended = Pending Payment effectively here
+            'subscription_status' => 'suspended',
+
+            // Save selected modules
+            'settings' => ['modules' => $request->input('modules', ['transport'])],
         ]);
 
         // 4. Redirect to Payment (Stripe/PayPal)

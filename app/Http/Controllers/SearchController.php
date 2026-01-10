@@ -36,24 +36,62 @@ class SearchController extends Controller
             }
         }
 
-        // Find or Create Zone (Auto-learning names) - Only find for now to check services
-        $zone = \App\Models\Zone::where('name', $destinationName)->first();
+        // Check for Tenant
+        $tenant = app()->bound('tenant') ? app('tenant') : null;
+
+        // Helper to normalize
+        $searchName = $destinationName;
+        if (stripos($destinationName, 'Moon Palace') !== false || stripos($destinationName, 'Cancun Hotel Zone') !== false) {
+            $searchName = 'Zona Hotelera';
+        }
+
+        // Find Zone - Scoped to Tenant
+        $zoneQuery = \App\Models\Zone::where(function ($q) use ($searchName) {
+            $q->where('name', 'LIKE', $searchName)
+                ->orWhere('name', 'LIKE', '%' . $searchName . '%');
+        });
+
+        if ($tenant) {
+            $zoneQuery->where('organization_id', $tenant->id);
+        }
+        $zone = $zoneQuery->first();
+
         if (!$zone) {
-            // If zone doesn't exist, created it but it will have no services
-            $zone = \App\Models\Zone::create(['name' => $destinationName]);
+            // Try exact match on 'Zona Hotelera' if we failed and input looks like a hotel zone address
+            if ($tenant && (stripos($searchName, 'hotel') !== false || stripos($searchName, 'cancun') !== false)) {
+                $zone = \App\Models\Zone::where('organization_id', $tenant->id)
+                    ->where('name', 'LIKE', '%Zona Hotelera%')
+                    ->first();
+            }
+        }
+
+        if (!$zone) {
+            // STOP creating empty zones. It confuses the user with empty results.
+            // Return empty results instead of creating junk data.
+            return Inertia::render('SearchResults', [
+                'results' => [],
+                'searchParams' => $request->all(),
+            ]);
         }
 
         // Fetch Search Results using Provider Logic
         // 1. Get services for this zone
         // 2. Filter active providers
-        // 3. Calculate units needed
-        $services = \App\Models\ProviderService::where('zone_id', $zone->id)
+        // 3. Filter by Tenant (if applicable)
+        $servicesQuery = \App\Models\ProviderService::where('zone_id', $zone->id)
             ->whereHas('provider', function ($query) {
                 $query->where('is_active', true)
                     ->where('provider_type', 'transport'); // Only transport for now
-            })
-            ->with(['provider', 'service'])
-            ->get();
+            });
+
+        if ($tenant) {
+            // Ensure the LINKED SERVICE belongs to the tenant
+            $servicesQuery->whereHas('service', function ($q) use ($tenant) {
+                $q->where('organization_id', $tenant->id);
+            });
+        }
+
+        $services = $servicesQuery->with(['provider', 'service'])->get();
 
         $results = $services->map(function ($service) use ($pax) {
             // Unit Suggestion Logic

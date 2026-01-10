@@ -11,5 +11,6 @@ class ContentBlock extends Model
         'value',
         'type',
         'group',
+        'organization_id',
     ];
 }

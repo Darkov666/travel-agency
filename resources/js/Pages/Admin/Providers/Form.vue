@@ -1,5 +1,5 @@
 <script setup>
-import { Head, useForm, router } from '@inertiajs/vue3';
+import { Head, useForm, router, usePage } from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import { ref, computed } from 'vue';
 import Swal from 'sweetalert2';
@@ -9,16 +9,49 @@ const props = defineProps({
     provider: Object, // Null if creating
     availableServices: Array,
     availableZones: Array,
+    allowedTypes: {
+        type: Array,
+        default: () => ['transport', 'tour', 'water']
+    },
+    allOrganizations: { // Only passed if Root
+        type: Array,
+        default: () => []
+    }
 });
 
 const isEditing = computed(() => !!props.provider);
+const page = usePage();
+
+// Determine if we should show Services tab
+// Logic: If tenant has ONLY 'transport', hide it (unless user overrides).
+const hasNonTransportModules = computed(() => {
+    if (!page.props.tenant) return true; // Root
+    const modules = page.props.tenant.modules || [];
+    return modules.includes('tours') || modules.includes('shop');
+});
 
 const activeTab = ref('general');
-const tabs = [
+const tabs = computed(() => [
     { id: 'general', name: 'General Information' },
-    { id: 'vehicles', name: 'Fleet / Units', show: isEditing && props.provider?.provider_type === 'transport' },
-    { id: 'services', name: 'Products & Services', show: isEditing },
-];
+    { id: 'vehicles', name: 'Fleet / Units', show: isEditing.value && props.provider?.provider_type === 'transport' },
+    { 
+        id: 'services', 
+        name: hasNonTransportModules.value ? 'Products & Services' : 'Service Rates', 
+        show: isEditing.value 
+    },
+]);
+
+// Helper to format allowed types for display
+const formatType = (type) => {
+    const labels = {
+        transport: 'Transportation',
+        tour: 'Tours & Attractions',
+        water: 'Water Transport',
+        baggage: 'Baggage Handling',
+        groups_lodging: 'Groups & Lodging'
+    };
+    return labels[type] || type.charAt(0).toUpperCase() + type.slice(1);
+};
 
 const generalForm = useForm({
     name: props.provider?.name || '',
@@ -26,7 +59,7 @@ const generalForm = useForm({
     contact_name: props.provider?.contact_name || '',
     email: props.provider?.email || '',
     phone: props.provider?.phone || '',
-    provider_type: props.provider?.provider_type || 'transport',
+    provider_type: props.provider?.provider_type || (props.allowedTypes.length === 1 ? props.allowedTypes[0] : 'transport'),
     taxpayer_type: props.provider?.taxpayer_type || 'legal',
     full_address: props.provider?.full_address || '',
     priority: props.provider?.priority || 1,
@@ -34,27 +67,18 @@ const generalForm = useForm({
     exchange_rate: props.provider?.organization?.exchange_rate || 20.0,
     logo: null,
     tax_compliance: null,
+    assigned_organizations: props.provider?.assigned_organizations?.map(o => o.id) || [],
 });
 
 const submitGeneral = () => {
     if (isEditing.value) {
-        generalForm.post(route('admin.providers.update', props.provider.id), {
-            forceFormData: true, 
-            // Put method spoofing handled by Inertia/Laravel if using post with files for update often requires _method: PUT
-            onSuccess: () => Swal.fire('Saved', 'Provider updated', 'success'),
-        });
-        // Note: For file uploads with 'PUT', Laravel often needs POST with _method: PUT. 
-        // Inertia usually handles this, but useForm().post for update might default to POST.
-        // Let's rely on backend handling correct route. 
-        // Wait, route resource update is PUT/PATCH. HTML forms only support GET/POST.
-        // Inertia usually sends as POST with _method: PUT automatically if using form.put.
-        // BUT form.put DOES NOT support files well in Laravel due to PHP limitation.
-        // Best practice: Use POST with _method="PUT" inside the data if updating files.
+        // Use POST with _method: PUT for file uploads
         generalForm.transform((data) => ({
             ...data,
             _method: 'PUT',
-        })).post(route('admin.providers.update', props.provider.id));
-
+        })).post(route('admin.providers.update', props.provider.id), {
+            onSuccess: () => Swal.fire('Saved', 'Provider updated', 'success'),
+        });
     } else {
         generalForm.post(route('admin.providers.store'));
     }
@@ -81,7 +105,6 @@ const editVehicle = (vehicle) => {
         category: vehicle.category,
         image: null // Don't prefill file input
     };
-    // Scroll to form if needed
 };
 
 const cancelEditVehicle = () => {
@@ -247,7 +270,14 @@ const deleteService = async (id) => {
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Partner ID (Identifier)</label>
-                        <input v-model="generalForm.partner_id" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                        <input 
+                            v-model="generalForm.partner_id" 
+                            type="text" 
+                            :readonly="!isEditing"
+                            :placeholder="isEditing ? '' : 'Auto-generated'"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                            :class="{'bg-gray-100 text-gray-500': !isEditing}"
+                        >
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Exchange Rate (USD to MXN)</label>
@@ -256,9 +286,9 @@ const deleteService = async (id) => {
                      <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Provider Type</label>
                         <select v-model="generalForm.provider_type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:text-white dark:border-gray-600">
-                            <option value="transport">Transport</option>
-                            <option value="tour">Tour Operator</option>
-                            <option value="water">Yacht/Catamaran</option>
+                            <option v-for="type in allowedTypes" :key="type" :value="type">
+                                {{ formatType(type) }}
+                            </option>
                         </select>
                     </div>
                      <div>
@@ -303,6 +333,26 @@ const deleteService = async (id) => {
                 <div>
                      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Full Address</label>
                     <textarea v-model="generalForm.full_address" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:text-white dark:border-gray-600"></textarea>
+                </div>
+
+                <!-- Shared Organizations (Root Only) -->
+                <div v-if="allOrganizations.length > 0" class="border-t pt-4 mt-4 border-gray-200 dark:border-gray-700">
+                    <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-2">Share with Organizations (SaaS)</h4>
+                    <p class="text-xs text-gray-500 mb-3">Selected organizations will be able to see and use this provider.</p>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-40 overflow-y-auto p-2 bg-gray-50 dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-700">
+                        <div v-for="org in allOrganizations" :key="org.id" class="flex items-center">
+                            <input 
+                                type="checkbox" 
+                                :value="org.id" 
+                                v-model="generalForm.assigned_organizations"
+                                :id="`org-${org.id}`"
+                                class="h-4 w-4 text-cyan-600 focus:ring-cyan-500 border-gray-300 rounded"
+                            >
+                            <label :for="`org-${org.id}`" class="ml-2 block text-xs text-gray-700 dark:text-gray-300 truncate">
+                                {{ org.name }}
+                            </label>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -54,8 +54,8 @@ class IdentifyTenant
         // Bind to App Container
         app()->instance('tenant', $organization);
 
-        // Optional: Share with Inertia
-        \Inertia\Inertia::share('tenant', $organization);
+        // Optional: Share with Inertia - Handled by HandleInertiaRequests
+        // \Inertia\Inertia::share('tenant', $organization);
 
         return $next($request);
     }

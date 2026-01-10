@@ -56,4 +56,9 @@ class Service extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
+    public function providerServices()
+    {
+        return $this->hasMany(ProviderService::class);
+    }
 }

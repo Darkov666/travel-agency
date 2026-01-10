@@ -7,6 +7,7 @@ const props = defineProps({
     service: Object,
     providers: Array,
     categories: Array,
+    allowedTypes: Array,
 });
 
 const form = useForm({
@@ -95,13 +96,11 @@ const submit = () => {
 
                              <div class="col-span-2 md:col-span-1">
                                 <label class="block text-sm font-medium text-gray-700">Type</label>
-                                <input v-model="form.type" list="type-options" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="Select or type..." required>
-                                <datalist id="type-options">
-                                    <option value="transfer">Transfer</option>
-                                    <option value="tour">Tour</option>
-                                    <option value="water">Water Activity</option>
-                                    <option value="special">Special</option>
-                                </datalist>
+                                <select v-model="form.type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                                    <option v-for="type in allowedTypes" :key="type" :value="type">
+                                        {{ type.charAt(0).toUpperCase() + type.slice(1) }}
+                                    </option>
+                                </select>
                             </div>
 
                             <div class="col-span-2">

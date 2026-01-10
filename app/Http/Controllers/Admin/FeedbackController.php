@@ -14,16 +14,28 @@ class FeedbackController extends Controller
     {
         $type = $request->input('type', 'website'); // 'website' or 'service'
 
+        $user = auth()->user();
+
         if ($type === 'service') {
-            $feedbacks = Review::with(['reservation.service'])
-                ->latest()
-                ->paginate(15)
-                ->withQueryString();
+            $query = Review::with(['reservation.items.service'])->latest();
+
+            if ($user->organization_id) {
+                $query->whereHas('reservation', function ($q) use ($user) {
+                    $q->where('organization_id', $user->organization_id);
+                });
+            }
+
+            $feedbacks = $query->paginate(15)->withQueryString();
         } else {
-            $feedbacks = WebsiteFeedback::with('user')
-                ->latest()
-                ->paginate(15)
-                ->withQueryString();
+            // Website Feedback is Platform-wide, accessible only by Root
+            if ($user->role !== 'root') {
+                $feedbacks = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 15);
+            } else {
+                $feedbacks = WebsiteFeedback::with('user')
+                    ->latest()
+                    ->paginate(15)
+                    ->withQueryString();
+            }
         }
 
         return Inertia::render('Admin/Feedback/Index', [

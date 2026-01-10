@@ -8,16 +8,21 @@ const showingNotifications = ref(false);
 
 const navigation = [
     { name: 'Dashboard', label: 'admin_nav.dashboard', routeTarget: 'admin.dashboard', routeName: 'admin.dashboard', icon: 'fas fa-home', roles: ['root', 'admin', 'supervisor', 'operator'] },
+    { name: 'Driver Dashboard', label: 'admin_nav.dashboard', routeTarget: 'driver.dashboard', routeName: 'driver.*', icon: 'fas fa-car', roles: ['driver'] }, // Driver specific
     { name: 'Content', label: 'admin_nav.content', routeTarget: 'admin.content.index', routeName: 'admin.content.*', icon: 'fas fa-pen-fancy', roles: ['root', 'admin'] },
     { name: 'Blog', label: 'admin_nav.blog', routeTarget: 'admin.blog.index', routeName: 'admin.blog.*', icon: 'fas fa-newspaper', roles: ['root', 'admin'] },
     { name: 'Blog Categories', label: 'admin_nav.blog_categories', routeTarget: 'admin.blog-topics.index', routeName: 'admin.blog-topics.*', icon: 'fas fa-tags', roles: ['root', 'admin'] },
     { name: 'Organizations', label: 'admin_nav.organizations', routeTarget: 'admin.organizations.index', routeName: 'admin.organizations.*', icon: 'fas fa-sitemap', roles: ['root'] },
+    { name: 'Staff', label: 'Staff', routeTarget: 'admin.staff.index', routeName: 'admin.staff.*', icon: 'fas fa-users', roles: ['root', 'admin'] }, // New Staff Link
     { name: 'Approvals', label: 'admin_nav.approvals', routeTarget: 'admin.change-requests.index', routeName: 'admin.change-requests.*', icon: 'fas fa-clipboard-check', roles: ['root', 'admin'] },
     { name: 'Activity Log', label: 'admin_nav.activity_log', routeTarget: 'admin.activity-logs.index', routeName: 'admin.activity-logs.*', icon: 'fas fa-history', roles: ['root', 'admin'] },
     { name: 'Zones Editor', label: 'admin_nav.zones', routeTarget: 'admin.zones.index', routeName: 'admin.zones.*', icon: 'fas fa-map-marked-alt', roles: ['root', 'admin'] },
+
     { name: 'Service Catalog', label: 'admin_nav.services', routeTarget: 'admin.services.index', routeName: 'admin.services.*', icon: 'fas fa-umbrella-beach', roles: ['root', 'admin'] },
+    { name: 'Service Categories', label: 'admin_nav.categories', routeTarget: 'admin.categories.index', routeName: 'admin.categories.*', icon: 'fas fa-tags', roles: ['root', 'admin'] },
     { name: 'Providers', label: 'admin_nav.providers', routeTarget: 'admin.providers.index', routeName: 'admin.providers.*', icon: 'fas fa-building', roles: ['root', 'admin'] },
-    { name: 'Service Ops', label: 'admin_nav.service_ops', routeTarget: 'admin.reservations.index', routeName: 'admin.reservations.*', icon: 'fas fa-tasks', roles: ['root', 'admin', 'supervisor'] },
+    { name: 'Reservations', label: 'admin_nav.reservations', routeTarget: 'admin.reservations.index', routeName: 'admin.reservations.*', icon: 'fas fa-book', roles: ['root', 'admin', 'supervisor'] }, // Booking Management
+    { name: 'Operations', label: 'admin_nav.operations', routeTarget: 'admin.operations.index', routeName: 'admin.operations.*', icon: 'fas fa-tasks', roles: ['root', 'admin', 'supervisor'] }, // Execution Management
     { name: 'Feedback & Reviews', label: 'admin_nav.feedback', routeTarget: 'admin.feedback.index', routeName: 'admin.feedback.*', icon: 'fas fa-comments', roles: ['root', 'admin'] },
     { name: 'Comments', label: 'admin_nav.comments', routeTarget: 'admin.comments.index', routeName: 'admin.comments.*', icon: 'fas fa-comment-dots', roles: ['root', 'admin'] },
     // Provider Links
@@ -26,8 +31,39 @@ const navigation = [
 
 const visibleNavigation = computed(() => {
     if (!user.value) return [];
-    return navigation.filter(item => !item.roles || item.roles.includes(user.value.role));
+    
+    // Check if user belongs to a Tenant Organization (and isn't Root/Platform Admin managing it)
+    // Actually, "admin" role with organization_id IS a Tenant Admin.
+    const isTenantUser = user.value.organization_id !== null && user.value.role !== 'root'; 
+
+    return navigation.filter(item => {
+        // 1. Role Filter
+        if (item.roles && !item.roles.includes(user.value.role)) return false;
+
+        // 2. Tenant Scoping: Hide global modules for Tenant Admins
+        if (isTenantUser) {
+            const globalModules = [
+                // 'admin.content.index', // Re-enabling as per user request
+                // 'admin.blog.index', // BlogController is scoped
+                // 'admin.blog-topics.index',
+                'admin.organizations.index', // Already root only, but safe to keep
+                'admin.change-requests.index', // Maybe they need this? Approvals might be internal? Let's hide for now.
+                'admin.activity-logs.index' // Global log. Tenants might need their own log later.
+            ];
+            if (globalModules.includes(item.routeTarget)) return false;
+
+             // 3. Module Filtering
+            const modules = usePage().props.tenant ? (usePage().props.tenant.modules || ['transport', 'tours', 'shop']) : [];
+            
+            if (item.name === 'Blog' && !modules.includes('blog')) return false;
+            // Add other module checks here if needed (e.g. Shop/Tours if they become admin items)
+            if (item.name === 'Blog Categories' && !modules.includes('blog')) return false;
+        }
+
+        return true;
+    });
 });
+
 
 const logout = () => {
     router.post(route('admin.logout'));
@@ -41,11 +77,12 @@ const logout = () => {
 
         <!-- Sidebar -->
         <aside :class="{'translate-x-0': showingSidebar, '-translate-x-full': !showingSidebar}" class="fixed inset-y-0 left-0 z-50 w-64 bg-gray-800 text-white transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-auto">
-            <div class="flex items-center justify-center h-16 bg-gray-900 shadow-md">
-                <span class="text-xl font-bold tracking-wider text-cyan-400">TravelAdmin</span>
+            <div class="flex flex-col items-center justify-center h-20 bg-gray-900 shadow-md">
+                <span class="text-xl font-bold tracking-wider text-cyan-400">{{ $page.props.tenant ? $page.props.tenant.commercial_name : 'TravelAdmin' }}</span>
+                <span v-if="$page.props.tenant" class="text-xs text-gray-400 uppercase tracking-widest mt-1">Admin Panel</span>
             </div>
 
-            <nav class="mt-5 px-2 space-y-1">
+            <nav class="mt-2 px-2 space-y-1">
                 <Link v-for="item in visibleNavigation" :key="item.name" :href="route(item.routeTarget)" :class="[route().current(item.routeName) ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'group flex items-center px-2 py-2 text-base font-medium rounded-md']">
                     <!-- Icon placeholder if FontAwesome not loaded, or use Heroicons -->
                     <span class="mr-3 text-lg">
@@ -54,6 +91,7 @@ const logout = () => {
                         <svg v-if="item.name === 'Organizations'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                         <svg v-if="item.name === 'Zones Editor'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
                         <svg v-if="item.name === 'Service Catalog'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
+                        <svg v-if="item.name === 'Service Categories'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
                         <svg v-if="item.name === 'Approvals'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2-2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
                         <svg v-if="item.name === 'Activity Log'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         <svg v-if="item.name === 'Blog Categories'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>

@@ -24,6 +24,7 @@ const form = useForm({
     hosting_mode: 'subdomain',
     subdomain_slug: '',
     custom_domain: '',
+    modules: ['transport'], // Default to transport
 });
 
 const submit = () => {
@@ -64,6 +65,28 @@ const handleFileUpload = (field, e) => {
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Commercial Name</label>
                                     <input v-model="form.commercial_name" type="text" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white" required placeholder="e.g. My Travel Agency">
                                     <div v-if="form.errors.commercial_name" class="text-red-500 text-xs mt-1">{{ form.errors.commercial_name }}</div>
+                                </div>
+                                <div class="col-span-1 md:col-span-2">
+                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Service Types (Modules)</label>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <label class="flex items-center space-x-3">
+                                            <input type="checkbox" v-model="form.modules" value="transport" class="h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                                            <span class="text-gray-700 dark:text-gray-300">Transportation (Transfers)</span>
+                                        </label>
+                                        <label class="flex items-center space-x-3">
+                                            <input type="checkbox" v-model="form.modules" value="tours" class="h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                                            <span class="text-gray-700 dark:text-gray-300">Tours & Packages</span>
+                                        </label>
+                                        <label class="flex items-center space-x-3">
+                                            <input type="checkbox" v-model="form.modules" value="baggage" class="h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                                            <span class="text-gray-700 dark:text-gray-300">Baggage Handling</span>
+                                        </label>
+                                        <label class="flex items-center space-x-3">
+                                            <input type="checkbox" v-model="form.modules" value="groups_lodging" class="h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                                            <span class="text-gray-700 dark:text-gray-300">Groups & Lodging</span>
+                                        </label>
+                                    </div>
+                                    <div v-if="form.errors.modules" class="text-red-500 text-xs mt-1">{{ form.errors.modules }}</div>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Business Type (Giro)</label>

@@ -31,6 +31,7 @@ class ServiceController extends Controller
         return Inertia::render('Admin/Services/Create', [
             'providers' => \App\Models\Provider::select('id', 'name')->get(),
             'categories' => \App\Models\Category::where('is_active', true)->get(),
+            'allowedTypes' => $this->getAllowedTypes(),
         ]);
     }
 
@@ -81,7 +82,35 @@ class ServiceController extends Controller
             'service' => $service,
             'providers' => \App\Models\Provider::select('id', 'name')->get(),
             'categories' => \App\Models\Category::where('is_active', true)->get(),
+            'allowedTypes' => $this->getAllowedTypes(),
         ]);
+    }
+
+    private function getAllowedTypes()
+    {
+        $tenant = auth()->user()->organization;
+        if (!$tenant) {
+            return ['transfer', 'hourly', 'tour', 'package', 'water', 'attraction', 'special', 'merchandise'];
+        }
+
+        $modules = $tenant->settings['modules'] ?? ['transport', 'tours', 'shop'];
+        $types = [];
+
+        if (in_array('transport', $modules)) {
+            $types = array_merge($types, ['transfer', 'hourly']);
+        }
+        if (in_array('tours', $modules)) {
+            $types = array_merge($types, ['tour', 'package', 'water', 'attraction']);
+        }
+        if (in_array('shop', $modules)) {
+            $types = array_merge($types, ['merchandise', 'special']);
+        }
+        // Fallback if empty but tenant exists (shouldn't happen)
+        if (empty($types)) {
+            $types = ['transfer'];
+        }
+
+        return array_unique($types);
     }
 
     public function update(Request $request, Service $service)

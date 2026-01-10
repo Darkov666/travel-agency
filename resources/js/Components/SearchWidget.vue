@@ -228,7 +228,7 @@ const autoSelectZone = (address) => {
         // Special mappings for better UX
         if (zoneName === 'Cancun Hotel Zone' && lowerAddr.includes('zona hotelera')) return true;
         if (zoneName === 'Cancun Hotel Zone' && lowerAddr.includes('boulevard kukulcan')) return true;
-        if (zoneName === 'Cancun Hotel Zone' && lowerAddr.includes('moon palace')) return true; // Hardcoded fix for Moon Palace request
+        if ((zoneName === 'Cancun Hotel Zone' || lowerZone === 'zona hotelera') && lowerAddr.includes('moon palace')) return true; // Hardcoded fix for Moon Palace request
         
         return false;
     });

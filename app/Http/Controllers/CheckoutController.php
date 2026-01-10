@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Appointment;
 use Illuminate\Support\Facades\Hash;
 use App\Services\StripeService;
+use Stripe\StripeClient;
 
 class CheckoutController extends Controller
 {
@@ -63,8 +64,14 @@ class CheckoutController extends Controller
             $totalAmount += $item->price; // Assumed price is total for line item
         }
 
+        $organizationId = null;
+        if (app()->bound('tenant')) {
+            $organizationId = app('tenant')->id;
+        }
+
         $reservation = \App\Models\Reservation::create([
             'booking_ref' => (string) \Illuminate\Support\Str::uuid(),
+            'organization_id' => $organizationId,
             'user_id' => Auth::id(),
             'contact_name' => $validated['contact_name'],
             'contact_surname' => $validated['contact_surname'],
@@ -85,7 +92,7 @@ class CheckoutController extends Controller
                 'service_name' => $item->providerService->service->title ?? $item->providerService->name,
                 'provider_name' => $item->providerService->provider->name,
                 'zone_name' => $item->providerService->zone->name ?? 'N/A',
-                'quantity' => $item->quantity,
+                'quantity' => $item->quantity ?? 1,
                 'units' => $item->units,
                 'pax' => $item->pax,
                 'date' => $item->date,
@@ -148,8 +155,15 @@ class CheckoutController extends Controller
         ]);
     }
 
-    public function processPayment(Request $request, $bookingRef, StripeService $stripe)
+    public function processPayment(Request $request, $bookingRef)
     {
+        // Manual instantiation to catch constructor errors within this method
+        try {
+            $stripe = new StripeService();
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
         $reservation = \App\Models\Reservation::where('booking_ref', $bookingRef)->firstOrFail();
 
         $validated = $request->validate([

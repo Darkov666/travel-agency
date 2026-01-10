@@ -70,7 +70,11 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn() => $request->session()->get('success'),
                 'error' => fn() => $request->session()->get('error'),
             ],
-            'tenant' => app()->bound('tenant') ? app('tenant')->only(['id', 'commercial_name', 'fiscal_address', 'representative_email']) : null,
+            'tenant' => app()->bound('tenant') ? array_merge(
+                app('tenant')->only(['id', 'commercial_name', 'fiscal_address', 'representative_email']),
+                ['modules' => app('tenant')->settings['modules'] ?? ['transport', 'tours', 'shop']]
+            ) : null,
+            'appName' => config('app.name'),
         ];
     }
 }

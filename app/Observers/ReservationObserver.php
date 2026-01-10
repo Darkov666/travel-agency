@@ -36,6 +36,7 @@ class ReservationObserver
                     ServiceOrder::create([
                         'reservation_item_id' => $item->id,
                         'folio' => $reservation->booking_ref,
+                        'item_reference' => 'ITM-' . str_pad($item->id, 5, '0', STR_PAD_LEFT), // Format: ITM-00001
                         'status' => 'pending',
                     ]);
                 }

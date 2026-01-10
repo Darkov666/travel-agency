@@ -73,6 +73,12 @@ import Swal from 'sweetalert2';
 
 const page = usePage();
 
+const hasModule = (module) => {
+    if (!page.props.tenant) return true; // Root sees all (or default)
+    const modules = page.props.tenant.modules || ['transport', 'tours', 'shop', 'blog'];
+    return modules.includes(module);
+};
+
 watch(() => page.props.flash, (flash) => {
     if (flash?.success) {
          Swal.fire({
@@ -98,6 +104,7 @@ watch(() => page.props.flash, (flash) => {
 </script>
 
 <template>
+
     <div class="min-h-screen bg-primary-50 dark:bg-secondary-950 font-sans text-secondary-700 dark:text-secondary-200 transition-colors duration-300">
         <!-- Navigation -->
         <nav :key="currentLang" class="bg-cyan-600 dark:bg-gray-900 border-b border-cyan-500 dark:border-gray-800 sticky top-0 z-50 transition-colors duration-300 shadow-md">
@@ -107,7 +114,7 @@ watch(() => page.props.flash, (flash) => {
                         <!-- Logo -->
                         <div class="shrink-0 flex items-center">
                             <Link href="/" class="text-2xl font-serif font-bold text-white transition hover:text-cyan-50">
-                                {{ $page.props.tenant ? $page.props.tenant.commercial_name : 'Cancun Sunny' }}
+                                {{ $page.props.tenant ? $page.props.tenant.commercial_name : $page.props.appName }}
                             </Link>
                         </div>
 
@@ -116,10 +123,10 @@ watch(() => page.props.flash, (flash) => {
                            <Link href="/" :class="{'border-white text-white dark:border-cyan-400 dark:text-white': $page.url === '/', 'border-transparent text-cyan-50 dark:text-gray-300 hover:text-white dark:hover:text-white hover:border-cyan-200': $page.url !== '/'}" class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-bold leading-5 transition-colors duration-300 ease-in-out">
                                 {{ $t('nav.home') }}
                             </Link> 
-                            <Link href="/services" :class="{'border-white text-white dark:border-cyan-400 dark:text-white': $page.url.startsWith('/services'), 'border-transparent text-cyan-50 dark:text-gray-300 hover:text-white dark:hover:text-white hover:border-cyan-200': !$page.url.startsWith('/services')}" class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-bold leading-5 transition-colors duration-300 ease-in-out">
+                            <Link v-if="hasModule('transport')" href="/services" :class="{'border-white text-white dark:border-cyan-400 dark:text-white': $page.url.startsWith('/services'), 'border-transparent text-cyan-50 dark:text-gray-300 hover:text-white dark:hover:text-white hover:border-cyan-200': !$page.url.startsWith('/services')}" class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-bold leading-5 transition-colors duration-300 ease-in-out">
                                 {{ $t('nav.services') }}
                             </Link>
-                            <Link href="/shop" :class="{'border-white text-white dark:border-cyan-400 dark:text-white': $page.url.startsWith('/shop'), 'border-transparent text-cyan-50 dark:text-gray-300 hover:text-white dark:hover:text-white hover:border-cyan-200': !$page.url.startsWith('/shop')}" class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-bold leading-5 transition-colors duration-300 ease-in-out">
+                            <Link v-if="hasModule('shop')" href="/shop" :class="{'border-white text-white dark:border-cyan-400 dark:text-white': $page.url.startsWith('/shop'), 'border-transparent text-cyan-50 dark:text-gray-300 hover:text-white dark:hover:text-white hover:border-cyan-200': !$page.url.startsWith('/shop')}" class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-bold leading-5 transition-colors duration-300 ease-in-out">
                                 {{ $t('nav.shop') }}
                             </Link>
                             <Link href="/blog" :class="{'border-white text-white dark:border-cyan-400 dark:text-white': $page.url.startsWith('/blog'), 'border-transparent text-cyan-50 dark:text-gray-300 hover:text-white dark:hover:text-white hover:border-cyan-200': !$page.url.startsWith('/blog')}" class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-bold leading-5 transition-colors duration-300 ease-in-out">
@@ -128,13 +135,13 @@ watch(() => page.props.flash, (flash) => {
                             <Link href="/contact" :class="{'border-white text-white dark:border-cyan-400 dark:text-white': $page.url.startsWith('/contact'), 'border-transparent text-cyan-50 dark:text-gray-300 hover:text-white dark:hover:text-white hover:border-cyan-200': !$page.url.startsWith('/contact')}" class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-bold leading-5 transition-colors duration-300 ease-in-out">
                                 {{ $t('nav.contact') }}
                             </Link>
-                            <Link href="/partners" class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-bold leading-5 transition-colors duration-300 ease-in-out border-transparent text-cyan-50 dark:text-gray-300 hover:text-white dark:hover:text-white hover:border-cyan-200">
+                            <Link v-if="!$page.props.tenant" href="/partners" class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-bold leading-5 transition-colors duration-300 ease-in-out border-transparent text-cyan-50 dark:text-gray-300 hover:text-white dark:hover:text-white hover:border-cyan-200">
                                 {{ $t('nav.partners') }}
                             </Link>
                         </div>
                     </div>
 
-                    <!-- Right Side Toggles -->
+                    <!-- ... Right Side Toggles ... -->
                     <div class="hidden sm:flex sm:items-center sm:ml-6 space-x-3">
                         <!-- Currency Toggle -->
                         <CurrencyToggle />
@@ -181,10 +188,13 @@ watch(() => page.props.flash, (flash) => {
 
             <!-- Responsive Navigation Menu -->
             <div :class="{'block': showingNavigationDropdown, 'hidden': !showingNavigationDropdown}" class="sm:hidden bg-white dark:bg-secondary-900 border-b border-secondary-200 dark:border-secondary-800">
+                <div class="pt-4 pb-2 px-4 border-b border-gray-100 dark:border-gray-800" v-if="$page.props.tenant">
+                    <span class="block text-lg font-bold text-cyan-600 dark:text-cyan-400">{{ $page.props.tenant.commercial_name }}</span>
+                </div>
                 <div class="pt-2 pb-3 space-y-1">
                     <Link href="/" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-secondary-600 dark:text-secondary-400 hover:text-secondary-800 dark:hover:text-white hover:bg-primary-50 dark:hover:bg-secondary-800 hover:border-primary-300 transition duration-150 ease-in-out">{{ $t('nav.home') }}</Link>
-                    <Link href="/services" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-secondary-600 dark:text-secondary-400 hover:text-secondary-800 dark:hover:text-white hover:bg-primary-50 dark:hover:bg-secondary-800 hover:border-primary-300 transition duration-150 ease-in-out">{{ $t('nav.services') }}</Link>
-                    <Link href="/shop" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-secondary-600 dark:text-secondary-400 hover:text-secondary-800 dark:hover:text-white hover:bg-primary-50 dark:hover:bg-secondary-800 hover:border-primary-300 transition duration-150 ease-in-out">{{ $t('nav.shop') }}</Link>
+                    <Link v-if="hasModule('transport')" href="/services" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-secondary-600 dark:text-secondary-400 hover:text-secondary-800 dark:hover:text-white hover:bg-primary-50 dark:hover:bg-secondary-800 hover:border-primary-300 transition duration-150 ease-in-out">{{ $t('nav.services') }}</Link>
+                    <Link v-if="hasModule('shop')" href="/shop" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-secondary-600 dark:text-secondary-400 hover:text-secondary-800 dark:hover:text-white hover:bg-primary-50 dark:hover:bg-secondary-800 hover:border-primary-300 transition duration-150 ease-in-out">{{ $t('nav.shop') }}</Link>
                     <Link href="/blog" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-secondary-600 dark:text-secondary-400 hover:text-secondary-800 dark:hover:text-white hover:bg-primary-50 dark:hover:bg-secondary-800 hover:border-primary-300 transition duration-150 ease-in-out">{{ $t('nav.blog') }}</Link>
                     <Link href="/contact" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-secondary-600 dark:text-secondary-400 hover:text-secondary-800 dark:hover:text-white hover:bg-primary-50 dark:hover:bg-secondary-800 hover:border-primary-300 transition duration-150 ease-in-out">{{ $t('nav.contact') }}</Link>
                     <Link v-if="!$page.props.tenant" href="/partners" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-secondary-600 dark:text-secondary-400 hover:text-secondary-800 dark:hover:text-white hover:bg-primary-50 dark:hover:bg-secondary-800 hover:border-primary-300 transition duration-150 ease-in-out">{{ $t('nav.partners') }}</Link>
@@ -217,7 +227,7 @@ watch(() => page.props.flash, (flash) => {
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                     <div class="md:col-span-1">
                         <h3 class="text-xl font-serif font-bold mb-4 text-secondary-900 dark:text-white transition-colors duration-300">
-                            {{ $page.props.tenant ? $page.props.tenant.commercial_name : 'Cancun Sunny' }}
+                            {{ $page.props.tenant ? $page.props.tenant.commercial_name : $page.props.appName }}
                         </h3>
                         <p class="text-sm leading-relaxed transition-colors duration-300">
                             {{ $t('footer.description') }}
@@ -248,7 +258,7 @@ watch(() => page.props.flash, (flash) => {
                     </div>                    
                 </div>
                 <div class="mt-8 pt-8 border-t border-secondary-200 dark:border-secondary-800 text-center text-sm text-secondary-500 dark:text-gray-500 transition-colors duration-300">
-                    &copy; {{ new Date().getFullYear() }} {{ $page.props.tenant ? $page.props.tenant.commercial_name : 'Cancun Sunny' }}. {{ $t('footer.rights') }}
+                    &copy; {{ new Date().getFullYear() }} {{ $page.props.tenant ? $page.props.tenant.commercial_name : $page.props.appName }}. {{ $t('footer.rights') }}
                 </div>
             </div>
         </footer>

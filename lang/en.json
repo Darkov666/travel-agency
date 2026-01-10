@@ -40,8 +40,11 @@
     "admin_nav.activity_log": "Activity Log",
     "admin_nav.zones": "Zones Editor",
     "admin_nav.services": "Service Catalog",
+    "admin_nav.categories": "Service Categories",
     "admin_nav.providers": "Providers",
-    "admin_nav.service_ops": "Service Ops",
+    "admin_nav.reservations": "Reservations",
+    "admin_nav.operations": "Operations",
+    "admin_nav.service_ops": "Operations (Legacy)",
     "admin_nav.feedback": "Feedback & Reviews",
     "admin_nav.comments": "Comments",
     "admin_nav.my_zones": "My Zones"

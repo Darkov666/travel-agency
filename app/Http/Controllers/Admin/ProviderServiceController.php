@@ -31,6 +31,7 @@ class ProviderServiceController extends Controller
     {
         $validated = $request->validate([
             'zone_id' => 'nullable|exists:zones,id',
+            'service_id' => 'nullable|exists:services,id',
             'name' => 'nullable|string',
             'description' => 'nullable|string',
             'cost_net' => 'required|numeric|min:0',

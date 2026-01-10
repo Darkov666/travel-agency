@@ -10,6 +10,8 @@ class Zone extends Model
 {
     use HasFactory, BelongsToOrganization;
 
+    public $allowGlobalScope = true; // Allow tenants to see global (referential) zones
+
     protected $fillable = [
         'name',
         'kml_path',

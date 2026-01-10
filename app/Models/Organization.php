@@ -60,4 +60,32 @@ class Organization extends Model
     {
         return $this->hasMany(User::class);
     }
+
+    public function providers(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Provider::class); // Owned Providers
+    }
+
+    public function assignedProviders(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Provider::class, 'organization_provider')
+            ->withPivot('is_active', 'commission_rate')
+            ->withTimestamps();
+    }
+
+    /**
+     * Check if organization has a specific module enabled.
+     * Default modules: transport, tours, shop
+     */
+    public function hasModule(string $module): bool
+    {
+        // Null settings implies all enabled? Or none?
+        // Let's assume if 'modules' key is missing, it's a legacy or default root -> All enabled (or restricted, better default to strict).
+        // User request: "Cancun Sunny" (Transport Only).
+        // Strategy: If 'modules' array exists, check against it. If not, default to ALL (for existing Root) OR strict?
+        // Let's default to ['transport', 'tours', 'shop'] if not set, to avoid breaking existing.
+        // BUT for "Cancun Sunny" we will explicitly set it.
+        $modules = $this->settings['modules'] ?? ['transport', 'tours', 'shop'];
+        return in_array($module, $modules);
+    }
 }

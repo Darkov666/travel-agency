@@ -16,12 +16,12 @@ class ChangeRequestController extends Controller
         $query = ChangeRequest::where('status', 'pending')->with(['user']);
 
         if ($user->role !== 'root') {
-            if (!$user->organization) {
+            if (!$user->organization_id) {
                 return Inertia::render('Admin/ChangeRequests/Index', [
                     'requests' => []
                 ]);
             }
-            $query->where('organization_id', $user->organization->id);
+            $query->where('organization_id', $user->organization_id);
         }
 
         $requests = $query->latest()

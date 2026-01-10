@@ -34,7 +34,12 @@ const cancel = (item) => {
         <div class="py-12 max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
-                    <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Reservation Items (Service Control)</h3>
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-medium leading-6 text-gray-900">Reservation Items (Service Control)</h3>
+                        <Link :href="route('admin.reservations.create')" class="bg-cyan-600 text-white px-4 py-2 rounded shadow text-sm hover:bg-cyan-700">
+                            + New Reservation
+                        </Link>
+                    </div>
                     
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
@@ -74,19 +79,17 @@ const cancel = (item) => {
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                                         <div v-if="!item.assigned_provider_id">
-                                            <!-- Simple ID input for now, ideally a select box of providers -->
-                                            <!-- Assuming current provider_service has a provider attached -->
                                             <button 
-                                                v-if="item.provider_service?.provider_id"
-                                                @click="assign(item, item.provider_service.provider_id)" 
-                                                class="text-indigo-600 hover:text-indigo-900"
+                                                v-if="$page.props.auth.user.role === 'root' || $page.props.auth.user.role === 'admin' || $page.props.auth.user.role === 'supervisor'"
+                                                @click="assign(item, item.provider_service?.provider_id)" 
+                                                class="text-teal-600 hover:text-teal-900 font-bold"
                                             >
-                                                Assign {{ item.provider_service.provider.name }}
+                                                {{ item.provider_service?.provider_id ? 'Assign Default' : 'Assign Provider' }}
                                             </button>
-                                            <span v-else class="text-gray-400">No Default Provider</span>
                                         </div>
-                                        <div v-else>
-                                             <button @click="cancel(item)" class="text-red-600 hover:text-red-900">Cancel / Reassign</button>
+                                        <div v-else class="flex flex-col space-y-1">
+                                             <button @click="assign(item, null)" class="text-indigo-600 hover:text-indigo-900 text-xs">Reassign</button>
+                                             <button @click="cancel(item)" class="text-red-600 hover:text-red-900 text-xs">Cancel Vendor</button>
                                         </div>
                                     </td>
                                 </tr>

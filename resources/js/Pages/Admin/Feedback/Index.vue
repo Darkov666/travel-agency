@@ -103,7 +103,7 @@ const deleteFeedback = (id) => {
                                     <div class="flex items-center justify-between mb-2">
                                         <p class="text-sm font-medium text-cyan-600 truncate">
                                             {{ item.reviewer_name }}
-                                            <span class="text-gray-400 font-normal">on Service: {{ item.reservation?.service?.name || 'N/A' }}</span>
+                                            <span class="text-gray-400 font-normal">on Service: {{ item.reservation?.items?.[0]?.service?.name || item.reservation?.items?.[0]?.service_name || 'N/A' }}</span>
                                         </p>
                                         <div class="ml-2 flex-shrink-0 flex">
                                             <span v-if="item.is_approved" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">

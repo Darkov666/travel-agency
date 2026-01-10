@@ -11,21 +11,51 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 
 Route::get('/', function () {
-    if (app()->bound('tenant')) {
-        return Inertia::render('TenantWelcome', [
-            'tenant' => app('tenant'),
-            'services' => \App\Models\Service::where('organization_id', app('tenant')->id)->where('is_active', true)->get()
-        ]);
+    $tenant = app()->bound('tenant') ? app('tenant') : null;
+
+    // Base queries
+    $servicesQuery = Service::where('is_active', true)->whereNotIn('type', ['transfer']);
+    $postsQuery = BlogPost::where('is_published', true);
+    $blocksQuery = \App\Models\ContentBlock::where('group', 'home');
+
+    // Tenant Scoping
+    if ($tenant) {
+        $servicesQuery->where('organization_id', $tenant->id);
+        // Blog scoping: If tenant has own blog posts, filter. Else show none or global? 
+        // Plan says: "Recent Blog Posts (Tenant only)". Assuming tenants create their own posts.
+        // If we want to allow global posts to show on tenant sites, we'd need a 'global' flag.
+        // For now, strict scoping to organization if Author belongs to it? 
+        // Actually BlogPost usually has 'author_id'. We need to check relation.
+        // Simplification: Filter by author's organization_id.
+        $postsQuery->whereHas('author', function ($q) use ($tenant) {
+            $q->where('organization_id', $tenant->id);
+        });
+
+        // Content Blocks: Tenant specific not yet implemented fully, fallback to global for now
+        // or empty if we want them to configure it.
+        // Let's stick to global for now as "Inherit features".
+    } else {
+        // Root: Show only Root services (org_id null) or all? 
+        // "Traken" aggregation usually shows all or platform services.
+        // Let's assume Root shows Platform services (organization_id is null or specific)
+        // Adjust as needed. For now, showing all active non-transfer is fine for Aggregator.
     }
 
-    // Fetch Content Blocks for Welcome Page
-    $contentBlocks = \App\Models\ContentBlock::where('group', 'home')->get()->pluck('value', 'key');
+    $contentBlocks = $blocksQuery->get()->pluck('value', 'key');
 
     return Inertia::render('Welcome', [
-        'featuredServices' => Service::where('is_active', true)->whereNotIn('type', ['transfer'])->latest()->take(3)->get(),
-        'latestPosts' => BlogPost::where('is_published', true)->latest('published_at')->take(3)->get(),
-        'latestReviews' => \App\Models\Review::where('is_approved', true)->latest()->take(5)->get(),
-        'zones' => \App\Models\Zone::all(['name', 'coordinates']), // Pass coordinates for geofencing
+        'featuredServices' => $servicesQuery->latest()->take(3)->get(),
+        'latestPosts' => $postsQuery->latest('published_at')->take(3)->get(),
+        'latestReviews' => \App\Models\Review::where('is_approved', true) // Filter by tenant services?
+            ->when($tenant, function ($q) use ($tenant) {
+                $q->whereHas('reservation', function ($rq) use ($tenant) {
+                    $rq->where('organization_id', $tenant->id);
+                });
+            })
+            ->latest()->take(5)->get(),
+        'zones' => $tenant
+            ? \App\Models\Zone::where('organization_id', $tenant->id)->get(['name', 'coordinates'])
+            : \App\Models\Zone::all(['name', 'coordinates']),
         'contentBlocks' => $contentBlocks,
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
@@ -165,6 +195,11 @@ Route::prefix('admin')->group(function () {
 
         // Reservations Operation
         Route::get('/reservations', [\App\Http\Controllers\Admin\ReservationController::class, 'index'])->name('admin.reservations.index');
+        Route::get('/reservations/create', [\App\Http\Controllers\Admin\ReservationController::class, 'create'])->name('admin.reservations.create');
+        Route::post('reservations/store', [App\Http\Controllers\Admin\ReservationController::class, 'store'])->name('reservations.store');
+
+        // Staff Management
+        Route::resource('staff', App\Http\Controllers\Admin\StaffController::class)->names('admin.staff');
         Route::post('/reservations/{item}/assign', [\App\Http\Controllers\Admin\ReservationController::class, 'assignProvider'])->name('admin.reservations.assign');
         Route::post('/operator/service/{item}/status', [\App\Http\Controllers\ServiceStatusController::class, 'updateItemStatus'])->name('operator.update-status');
         Route::post('/operator/availability', [\App\Http\Controllers\ServiceStatusController::class, 'toggleAvailability'])->name('operator.toggle-availability');
@@ -208,6 +243,7 @@ Route::prefix('admin')->group(function () {
 
         // Service Management
         Route::resource('/services', \App\Http\Controllers\Admin\ServiceController::class)->names('admin.services');
+        Route::resource('/categories', \App\Http\Controllers\Admin\CategoryController::class)->names('admin.categories');
 
         // Unified Feedback Dashboard
         Route::get('/feedback-center', [\App\Http\Controllers\Admin\FeedbackController::class, 'index'])->name('admin.feedback.index');
@@ -221,7 +257,13 @@ Route::prefix('admin')->group(function () {
         Route::post('/feedback/reviews/{review}/reject', [\App\Http\Controllers\Admin\FeedbackController::class, 'rejectReview'])->name('admin.feedback.reviews.reject');
         Route::delete('/feedback/reviews/{review}', [\App\Http\Controllers\Admin\FeedbackController::class, 'destroyReview'])->name('admin.feedback.reviews.destroy');
 
-        // Dispatch & Operations
+        // Operations (Unified)
+        Route::get('/operations', [\App\Http\Controllers\Admin\OperationsController::class, 'index'])->name('admin.operations.index');
+        Route::get('/operations/{order}', [\App\Http\Controllers\Admin\OperationsController::class, 'show'])->name('admin.operations.show');
+        Route::put('/operations/{order}', [\App\Http\Controllers\Admin\OperationsController::class, 'update'])->name('admin.operations.update');
+        Route::delete('/operations/{order}', [\App\Http\Controllers\Admin\OperationsController::class, 'destroy'])->name('admin.operations.destroy');
+
+        // Dispatch & Operations (Legacy/Specific Map)
         Route::get('/dispatch', [\App\Http\Controllers\Admin\DispatchController::class, 'index'])->name('admin.dispatch.index');
         Route::post('/dispatch/{order}/assign', [\App\Http\Controllers\Admin\DispatchController::class, 'assign'])->name('admin.dispatch.assign');
         Route::post('/dispatch/{order}/unassign', [\App\Http\Controllers\Admin\DispatchController::class, 'unassign'])->name('admin.dispatch.unassign');
@@ -273,9 +315,65 @@ Route::get('/debug-data', function () {
     return ['services' => \App\Models\Service::all()];
 });
 
+Route::get('/debug-search-live', function () {
+    $tenant = \App\Models\Organization::where('slug', 'cancun-sunny')->first();
+    if (!$tenant)
+        return "Tenant 'cancun-sunny' NOT FOUND";
+
+    // Simulate what SearchController does
+    $destination = "Moon Palace";
+    // 1. Zone
+    $zone = \App\Models\Zone::where('organization_id', $tenant->id)
+        ->where(function ($q) use ($destination) {
+            $q->where('name', 'LIKE', $destination)
+                ->orWhere('name', 'LIKE', '%Zona Hotelera%'); // Simulate alias if backend mapping missing
+        })->first();
+
+    if (!$zone) {
+        // Broad search
+        $zone = \App\Models\Zone::where('organization_id', $tenant->id)->where('name', 'LIKE', '%Zona%')->first();
+    }
+
+    if (!$zone)
+        return "Zone NOT FOUND for tenant " . $tenant->id;
+
+    // 2. Services
+    $services = \App\Models\ProviderService::where('zone_id', $zone->id)
+        ->whereHas('service', function ($q) use ($tenant) {
+            $q->where('organization_id', $tenant->id);
+        })
+        ->with(['service', 'provider'])
+        ->get();
+
+    return [
+        'tenant' => $tenant->name,
+        'zone_found' => $zone->name,
+        'services_count' => $services->count(),
+        'services' => $services
+    ];
+});
+
 Route::get('/search', [App\Http\Controllers\SearchController::class, 'index'])->name('search');
 
-Route::get('/track/{serviceOrder}', [App\Http\Controllers\TrackingController::class, 'show'])->name('tracking.show');
+Route::get('/debug-org-7', function () {
+    $tenantId = 7;
+    $tenant = \App\Models\Organization::find($tenantId);
+
+    if (!$tenant)
+        return ['error' => 'Tenant 7 not found'];
+
+    $zones = \App\Models\Zone::where('organization_id', $tenantId)->get();
+
+    $services = \App\Models\Service::where('organization_id', $tenantId)
+        ->with(['providerServices.zone', 'providerServices.provider'])
+        ->get();
+
+    return [
+        'tenant' => $tenant,
+        'zones' => $zones,
+        'services' => $services
+    ];
+});
 
 Route::get('/contact', [App\Http\Controllers\ContactController::class, 'index'])->name('contact.index');
 Route::post('/contact', [App\Http\Controllers\ContactController::class, 'store'])->name('contact.store');

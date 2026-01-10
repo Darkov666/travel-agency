@@ -33,7 +33,7 @@ const deleteService = (id) => {
                     Services
                 </h2>
                 <div class="flex items-center space-x-4">
-                    <select v-model="providerId" class="text-sm rounded border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    <select v-model="providerId" class="text-sm rounded border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:text-white dark:border-gray-600">
                         <option value="all">All Providers</option>
                         <option v-for="provider in providers" :key="provider.id" :value="provider.id">{{ provider.name }}</option>
                     </select>

@@ -61,6 +61,18 @@ class ReservationItem extends Model
         return $this->belongsTo(ProviderService::class);
     }
 
+    public function service()
+    {
+        return $this->hasOneThrough(
+            Service::class,
+            ProviderService::class,
+            'id', // Foreign key on provider_services table... wait.
+            'id', // Foreign key on services table...
+            'provider_service_id', // Local key on reservation_items table
+            'service_id' // Local key on provider_services table
+        );
+    }
+
     public function assignedProvider()
     {
         return $this->belongsTo(Provider::class, 'assigned_provider_id');
