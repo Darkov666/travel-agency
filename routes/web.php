@@ -216,6 +216,7 @@ Route::prefix('admin')->group(function () {
         // Stripe Connect
         Route::get('/stripe/connect', [\App\Http\Controllers\Admin\StripeConnectController::class, 'connect'])->name('admin.stripe.connect');
         Route::get('/stripe/return', [\App\Http\Controllers\Admin\StripeConnectController::class, 'handleReturn'])->name('admin.stripe.return');
+        Route::post('/stripe/keys', [\App\Http\Controllers\Admin\StripeConnectController::class, 'storeKeys'])->name('admin.stripe.keys');
 
         // Change Requests (Provider Approvals)
         Route::get('/change-requests', [\App\Http\Controllers\Admin\ChangeRequestController::class, 'index'])->name('admin.change-requests.index');

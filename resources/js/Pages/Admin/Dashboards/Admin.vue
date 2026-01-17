@@ -1,12 +1,36 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, useForm } from '@inertiajs/vue3';
+import { ref } from 'vue';
+import DialogModal from '@/Components/DialogModal.vue';
+import InputLabel from '@/Components/InputLabel.vue';
+import TextInput from '@/Components/TextInput.vue';
+import PrimaryButton from '@/Components/PrimaryButton.vue';
+import SecondaryButton from '@/Components/SecondaryButton.vue';
+import InputError from '@/Components/InputError.vue';
 
-defineProps({
+const props = defineProps({
     organization: Object,
     stats: Object,
     chartData: Array
 });
+
+const showStripeModal = ref(false);
+const stripeForm = useForm({
+    stripe_key: props.organization?.stripe_key || '',
+    stripe_secret: '', // Don't show existing secret for security, only allow set new
+    stripe_webhook_secret: ''
+});
+
+const saveStripeKeys = () => {
+    stripeForm.post(route('admin.stripe.keys'), {
+        preserveScroll: true,
+        onSuccess: () => {
+            showStripeModal.value = false;
+            stripeForm.reset('stripe_secret', 'stripe_webhook_secret');
+        }
+    });
+};
 </script>
 
 <template>
@@ -21,11 +45,10 @@ defineProps({
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 
-                <!-- Stripe Connect Alert -->
-                <div v-if="organization && !organization.stripe_connect_id" class="bg-red-50 border-l-4 border-red-400 p-4 mb-8 flex justify-between items-center shadow-sm">
-                    <div class="flex">
+                <!-- Stripe Configuration Alert -->
+                <div v-if="organization && !organization.stripe_key" class="bg-red-50 border-l-4 border-red-400 p-4 mb-8 flex flex-col md:flex-row justify-between items-center shadow-sm">
+                    <div class="flex mb-4 md:mb-0">
                         <div class="flex-shrink-0">
-                            <!-- Warning Icon -->
                             <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
                             </svg>
@@ -36,31 +59,80 @@ defineProps({
                             </h3>
                             <div class="mt-2 text-sm text-red-700">
                                 <p>
-                                    To receive payouts and accept payments from clients, you must connect your Stripe account. 
-                                    Your account is currently limited.
+                                    To receive payouts and accept payments, you must configure your Stripe credentials.
                                 </p>
                             </div>
                         </div>
                     </div>
                     <div>
-                        <a :href="route('admin.stripe.connect')" class="whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                            Connect Stripe
-                        </a>
+                        <button @click="showStripeModal = true" class="whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                            Configure Stripe
+                        </button>
                     </div>
                 </div>
 
-                <div v-else class="bg-green-50 border-l-4 border-green-400 p-4 mb-8 flex items-center shadow-sm">
-                     <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                        </svg>
+                <div v-else class="bg-green-50 border-l-4 border-green-400 p-4 mb-8 flex justify-between items-center shadow-sm">
+                     <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-green-800">
+                                Stripe Configured • Payouts Enabled
+                            </p>
+                        </div>
                     </div>
-                    <div class="ml-3">
-                        <p class="text-sm font-medium text-green-800">
-                            Stripe Connected • Payouts Enabled
-                        </p>
+                    <div>
+                         <button @click="showStripeModal = true" class="text-sm text-green-700 hover:text-green-900 underline">
+                            Edit Configuration
+                        </button>
                     </div>
                 </div>
+
+                <!-- Stripe Configuration Modal -->
+                <DialogModal :show="showStripeModal" @close="showStripeModal = false">
+                    <template #title>
+                        Configure Stripe
+                    </template>
+                    <template #content>
+                        <div class="space-y-4">
+                            <p class="text-sm text-gray-500">
+                                Enter your Stripe API keys to enable payments. You can file these in your Stripe Dashboard under Developers > API Keys.
+                            </p>
+                            
+                            <div>
+                                <InputLabel for="stripe_key" value="Publishable Key (pk_test_...)" />
+                                <TextInput id="stripe_key" v-model="stripeForm.stripe_key" type="text" class="mt-1 block w-full" placeholder="pk_test_..." />
+                                <InputError :message="stripeForm.errors.stripe_key" class="mt-2" />
+                            </div>
+
+                            <div>
+                                <InputLabel for="stripe_secret" value="Secret Key (sk_test_...)" />
+                                <TextInput id="stripe_secret" v-model="stripeForm.stripe_secret" type="password" class="mt-1 block w-full" placeholder="sk_test_..." />
+                                <InputError :message="stripeForm.errors.stripe_secret" class="mt-2" />
+                                <p v-if="organization.stripe_key && !stripeForm.stripe_secret" class="text-xs text-green-600 mt-1">
+                                    Current secret key is set and secure. Leave blank to keep it.
+                                </p>
+                            </div>
+
+                            <div>
+                                <InputLabel for="stripe_webhook_secret" value="Webhook Secret (whsec_...)" />
+                                <TextInput id="stripe_webhook_secret" v-model="stripeForm.stripe_webhook_secret" type="password" class="mt-1 block w-full" placeholder="whsec_..." />
+                                <InputError :message="stripeForm.errors.stripe_webhook_secret" class="mt-2" />
+                            </div>
+                        </div>
+                    </template>
+                    <template #footer>
+                        <SecondaryButton @click="showStripeModal = false" class="mr-3">
+                            Cancel
+                        </SecondaryButton>
+                        <PrimaryButton @click="saveStripeKeys" :class="{ 'opacity-25': stripeForm.processing }" :disabled="stripeForm.processing">
+                            Save Configuration
+                        </PrimaryButton>
+                    </template>
+                </DialogModal>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 border-l-4 border-yellow-400">

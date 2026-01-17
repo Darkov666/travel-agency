@@ -56,4 +56,31 @@ class StripeConnectController extends Controller
         // Real status updates come via Webhooks.
         return redirect()->route('admin.dashboard')->with('success', 'Stripe onboarding flow completed. Please check status.');
     }
+
+    public function storeKeys(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user->isOrgAdmin()) {
+            abort(403);
+        }
+
+        // Allow secrets to be nullable (to keep existing)
+        $validated = $request->validate([
+            'stripe_key' => 'required|string|starts_with:pk_',
+            'stripe_secret' => 'nullable|string|starts_with:sk_',
+            'stripe_webhook_secret' => 'nullable|string|starts_with:whsec_',
+        ]);
+
+        // Remove empty secrets to prevent overwriting with null/empty string
+        if (empty($validated['stripe_secret'])) {
+            unset($validated['stripe_secret']);
+        }
+        if (empty($validated['stripe_webhook_secret'])) {
+            unset($validated['stripe_webhook_secret']);
+        }
+
+        $user->organization->update($validated);
+
+        return back()->with('success', 'Stripe keys updated successfully.');
+    }
 }

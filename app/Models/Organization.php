@@ -32,6 +32,9 @@ class Organization extends Model
         'monthly_fee',
         'commission_rate',
         'exchange_rate',
+        'stripe_key',
+        'stripe_secret',
+        'stripe_webhook_secret',
     ];
 
     protected $casts = [
@@ -44,6 +47,8 @@ class Organization extends Model
         'monthly_fee' => 'decimal:2',
         'commission_rate' => 'decimal:2',
         'exchange_rate' => 'decimal:4',
+        'stripe_secret' => 'encrypted',
+        'stripe_webhook_secret' => 'encrypted',
     ];
 
     public function isSuspended(): bool
